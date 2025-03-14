@@ -313,23 +313,71 @@ class ADClient:
         # These are stored as negative 100-nanosecond intervals
         # To convert to days: value / -864000000000
         if "maxPwdAge" in policy and policy["maxPwdAge"]:
-            max_pwd_age = int(policy["maxPwdAge"][0]) if isinstance(policy["maxPwdAge"], list) else int(policy["maxPwdAge"])
-            if max_pwd_age < 0:  # If 0, passwords never expire
-                policy["maxPwdAgeDays"] = abs(max_pwd_age) / 864000000000
+            # Handle datetime.timedelta objects
+            if hasattr(policy["maxPwdAge"], "total_seconds") or (isinstance(policy["maxPwdAge"], list) and hasattr(policy["maxPwdAge"][0], "total_seconds")):
+                # It's a timedelta object, extract total seconds and convert to days
+                if isinstance(policy["maxPwdAge"], list):
+                    policy["maxPwdAgeDays"] = abs(policy["maxPwdAge"][0].total_seconds()) / 86400
+                else:
+                    policy["maxPwdAgeDays"] = abs(policy["maxPwdAge"].total_seconds()) / 86400
             else:
-                policy["maxPwdAgeDays"] = 0  # Never expire
+                # Try to convert to int if not a timedelta
+                try:
+                    max_pwd_age = int(policy["maxPwdAge"][0]) if isinstance(policy["maxPwdAge"], list) else int(policy["maxPwdAge"])
+                    if max_pwd_age < 0:  # If 0, passwords never expire
+                        policy["maxPwdAgeDays"] = abs(max_pwd_age) / 864000000000
+                    else:
+                        policy["maxPwdAgeDays"] = 0  # Never expire
+                except (TypeError, ValueError):
+                    policy["maxPwdAgeDays"] = 0  # Default if conversion fails
         
         if "minPwdAge" in policy and policy["minPwdAge"]:
-            min_pwd_age = int(policy["minPwdAge"][0]) if isinstance(policy["minPwdAge"], list) else int(policy["minPwdAge"])
-            policy["minPwdAgeDays"] = abs(min_pwd_age) / 864000000000
+            # Handle datetime.timedelta objects
+            if hasattr(policy["minPwdAge"], "total_seconds") or (isinstance(policy["minPwdAge"], list) and hasattr(policy["minPwdAge"][0], "total_seconds")):
+                # It's a timedelta object, extract total seconds and convert to days
+                if isinstance(policy["minPwdAge"], list):
+                    policy["minPwdAgeDays"] = abs(policy["minPwdAge"][0].total_seconds()) / 86400
+                else:
+                    policy["minPwdAgeDays"] = abs(policy["minPwdAge"].total_seconds()) / 86400
+            else:
+                # Try to convert to int if not a timedelta
+                try:
+                    min_pwd_age = int(policy["minPwdAge"][0]) if isinstance(policy["minPwdAge"], list) else int(policy["minPwdAge"])
+                    policy["minPwdAgeDays"] = abs(min_pwd_age) / 864000000000
+                except (TypeError, ValueError):
+                    policy["minPwdAgeDays"] = 0  # Default if conversion fails
         
         if "lockoutDuration" in policy and policy["lockoutDuration"]:
-            lockout_duration = int(policy["lockoutDuration"][0]) if isinstance(policy["lockoutDuration"], list) else int(policy["lockoutDuration"])
-            policy["lockoutDurationMinutes"] = abs(lockout_duration) / 600000000
+            # Handle datetime.timedelta objects
+            if hasattr(policy["lockoutDuration"], "total_seconds") or (isinstance(policy["lockoutDuration"], list) and hasattr(policy["lockoutDuration"][0], "total_seconds")):
+                # It's a timedelta object, extract total seconds and convert to minutes
+                if isinstance(policy["lockoutDuration"], list):
+                    policy["lockoutDurationMinutes"] = abs(policy["lockoutDuration"][0].total_seconds()) / 60
+                else:
+                    policy["lockoutDurationMinutes"] = abs(policy["lockoutDuration"].total_seconds()) / 60
+            else:
+                # Try to convert to int if not a timedelta
+                try:
+                    lockout_duration = int(policy["lockoutDuration"][0]) if isinstance(policy["lockoutDuration"], list) else int(policy["lockoutDuration"])
+                    policy["lockoutDurationMinutes"] = abs(lockout_duration) / 600000000
+                except (TypeError, ValueError):
+                    policy["lockoutDurationMinutes"] = 0  # Default if conversion fails
         
         if "lockoutObservationWindow" in policy and policy["lockoutObservationWindow"]:
-            lockout_window = int(policy["lockoutObservationWindow"][0]) if isinstance(policy["lockoutObservationWindow"], list) else int(policy["lockoutObservationWindow"])
-            policy["lockoutObservationWindowMinutes"] = abs(lockout_window) / 600000000
+            # Handle datetime.timedelta objects
+            if hasattr(policy["lockoutObservationWindow"], "total_seconds") or (isinstance(policy["lockoutObservationWindow"], list) and hasattr(policy["lockoutObservationWindow"][0], "total_seconds")):
+                # It's a timedelta object, extract total seconds and convert to minutes
+                if isinstance(policy["lockoutObservationWindow"], list):
+                    policy["lockoutObservationWindowMinutes"] = abs(policy["lockoutObservationWindow"][0].total_seconds()) / 60
+                else:
+                    policy["lockoutObservationWindowMinutes"] = abs(policy["lockoutObservationWindow"].total_seconds()) / 60
+            else:
+                # Try to convert to int if not a timedelta
+                try:
+                    lockout_window = int(policy["lockoutObservationWindow"][0]) if isinstance(policy["lockoutObservationWindow"], list) else int(policy["lockoutObservationWindow"])
+                    policy["lockoutObservationWindowMinutes"] = abs(lockout_window) / 600000000
+                except (TypeError, ValueError):
+                    policy["lockoutObservationWindowMinutes"] = 0  # Default if conversion fails
         
         # Interpret pwdProperties flags
         if "pwdProperties" in policy and policy["pwdProperties"]:

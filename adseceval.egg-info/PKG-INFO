@@ -2,8 +2,8 @@ Metadata-Version: 2.2
 Name: adseceval
 Version: 0.1.0
 Summary: Active Directory Security Evaluation Tool
-Home-page: https://github.com/yourusername/ADSecEval
-Author: ADSecEval Team
+Home-page: https://github.com/ianrelecker/adsec
+Author: Ian Relecker
 Classifier: Development Status :: 3 - Alpha
 Classifier: Intended Audience :: Information Technology
 Classifier: Intended Audience :: System Administrators

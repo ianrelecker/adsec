@@ -214,7 +214,7 @@ class ReportGenerator:
                         html_parts.extend([
                             f"                    <button class='collapsible'>Show Technical Details</button>",
                             f"                    <div class='content'>",
-                            f"                        <pre>{html.escape(json.dumps(check.get('details', {}), indent=2))}</pre>",
+                            f"                        <pre>{html.escape(json.dumps(check.get('details', {}), indent=2, default=str))}</pre>",
                             f"                    </div>"
                         ])
                     

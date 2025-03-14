@@ -4,6 +4,7 @@ Assessment module for authentication protocols and advanced authentication in Ac
 
 import logging
 from typing import Dict, Any, List, Optional
+import ldap3
 
 from .base import AssessmentBase, CheckResult, CheckSeverity
 
@@ -90,7 +91,9 @@ class AuthProtocolsAssessment(AssessmentBase):
         functional_level = self.client.domain_info.get("functional_level", 0)
         
         # Windows Server 2016 functional level or higher generally supports channel binding
-        supports_channel_binding = functional_level >= 7  # 7 corresponds to Windows Server 2016
+        # Convert functional_level to int if it's a string
+        functional_level_int = int(functional_level) if str(functional_level).isdigit() else 0
+        supports_channel_binding = functional_level_int >= 7  # 7 corresponds to Windows Server 2016
         
         details = {
             "domain_controllers": len(domain_controllers),
@@ -254,7 +257,7 @@ class AuthProtocolsAssessment(AssessmentBase):
         computer_sample = self.client.search(
             search_filter="(&(objectClass=computer)(!(userAccountControl:1.2.840.113556.1.4.803:=8192)))",  # Non-DC computers
             attributes=["name", "ms-Mcs-AdmPwdExpirationTime"],
-            search_scope="subtree"
+            search_scope=ldap3.SUBTREE
         )[:10]  # Limit to 10 computers for sample
         
         laps_used = False
@@ -301,28 +304,28 @@ class AuthProtocolsAssessment(AssessmentBase):
         unconstrained_delegation = self.client.search(
             search_filter="(&(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=524288))",
             attributes=["name", "userAccountControl", "servicePrincipalName"],
-            search_scope="subtree"
+            search_scope=ldap3.SUBTREE
         )
         
         # Check for constrained delegation
         constrained_delegation = self.client.search(
             search_filter="(&(objectCategory=computer)(msDS-AllowedToDelegateTo=*))",
             attributes=["name", "msDS-AllowedToDelegateTo"],
-            search_scope="subtree"
+            search_scope=ldap3.SUBTREE
         )
         
         # Check for resource-based constrained delegation
         rbcd_query = self.client.search(
             search_filter="(&(objectCategory=computer)(msDS-AllowedToActOnBehalfOfOtherIdentity=*))",
             attributes=["name", "msDS-AllowedToActOnBehalfOfOtherIdentity"],
-            search_scope="subtree"
+            search_scope=ldap3.SUBTREE
         )
         
         # Find risky delegation configurations
         sensitive_accounts_with_delegation = self.client.search(
             search_filter="(&(|(objectCategory=user)(objectCategory=computer))(userAccountControl:1.2.840.113556.1.4.803:=1048576))",
             attributes=["name", "userAccountControl", "servicePrincipalName"],
-            search_scope="subtree"
+            search_scope=ldap3.SUBTREE
         )
         
         details = {

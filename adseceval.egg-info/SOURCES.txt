@@ -12,8 +12,11 @@ adseceval.egg-info/entry_points.txt
 adseceval.egg-info/requires.txt
 adseceval.egg-info/top_level.txt
 adseceval/assessments/__init__.py
+adseceval/assessments/adcs.py
+adseceval/assessments/auth_protocols.py
 adseceval/assessments/base.py
 adseceval/assessments/domain_controllers.py
 adseceval/assessments/password_policy.py
 adseceval/assessments/privileged_accounts.py
+adseceval/assessments/tiered_admin.py
 adseceval/assessments/trust_relationships.py
