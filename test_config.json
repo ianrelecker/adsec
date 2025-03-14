@@ -1,0 +1,18 @@
+{
+    "domain": {
+        "name": "test.local",
+        "server": "dc01.test.local",
+        "port": 389,
+        "use_ssl": false,
+        "use_tls": true
+    },
+    "auth": {
+        "username": "test\\user",
+        "password_env": "ADSECEVAL_PASSWORD",
+        "use_kerberos": false
+    },
+    "reporting": {
+        "output_dir": "./test_reports",
+        "formats": ["html", "json"]
+    }
+}
