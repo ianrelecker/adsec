@@ -130,22 +130,27 @@ class ReportGenerator:
             "        h1, h2, h3 { color: #0066cc; }",
             "        h1 { border-bottom: 2px solid #0066cc; padding-bottom: 10px; }",
             "        .summary-box { background-color: #f5f5f5; border-radius: 5px; padding: 15px; margin: 20px 0; }",
+            "        .remediation-box { background-color: #fff8e1; border-radius: 5px; padding: 15px; margin: 20px 0; border-left: 5px solid #ffa000; }",
+            "        .remediation-list li { margin-bottom: 12px; line-height: 1.4; }",
             "        .severity-critical { color: #d32f2f; }",
             "        .severity-high { color: #f57c00; }",
             "        .severity-medium { color: #fbc02d; }",
             "        .severity-low { color: #388e3c; }",
             "        .severity-info { color: #0288d1; }",
-            "        .status-passed { color: #388e3c; }",
-            "        .status-failed { color: #d32f2f; }",
+            "        .status-passed { color: #388e3c; font-weight: bold; }",
+            "        .status-failed { color: #d32f2f; font-weight: bold; }",
             "        table { border-collapse: collapse; width: 100%; margin: 15px 0; }",
             "        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }",
             "        th { background-color: #f2f2f2; }",
             "        tr:nth-child(even) { background-color: #f9f9f9; }",
             "        .details-container { margin-top: 10px; border-left: 3px solid #ddd; padding-left: 10px; }",
-            "        .collapsible { cursor: pointer; padding: 10px; border: none; text-align: left; outline: none; width: 100%; }",
-            "        .active, .collapsible:hover { background-color: #f1f1f1; }",
-            "        .content { padding: 0 18px; display: none; overflow: hidden; background-color: #f9f9f9; }",
+            "        .recommendation-box { background-color: #e8f5e9; border-radius: 3px; padding: 12px; margin: 8px 0; border-left: 3px solid #388e3c; }",
+            "        .reference-box { background-color: #e3f2fd; border-radius: 3px; padding: 12px; margin: 8px 0; }",
+            "        .collapsible { cursor: pointer; padding: 10px; border: none; text-align: left; outline: none; width: 100%; background-color: #eeeeee; border-radius: 3px; }",
+            "        .active, .collapsible:hover { background-color: #e0e0e0; }",
+            "        .content { padding: 12px; display: none; overflow: hidden; background-color: #f9f9f9; margin-top: 5px; border-radius: 3px; }",
             "        #summary-chart { width: 100%; height: 300px; }",
+            "        pre { white-space: pre-wrap; word-wrap: break-word; }",
             "    </style>",
             "</head>",
             "<body>",
@@ -162,8 +167,38 @@ class ReportGenerator:
             f"            <li class='severity-low'>Low: {severity_counts.get('Low', 0)}</li>",
             f"            <li class='severity-info'>Informational: {severity_counts.get('Informational', 0)}</li>",
             "        </ul>",
-            "    </div>"
+            "    </div>",
+            "    <div class='remediation-box'>",
+            "        <h2>Top Remediation Recommendations</h2>",
+            "        <p>The following high-priority issues should be addressed first:</p>",
+            "        <ol class='remediation-list'>"
         ]
+        
+        # Collect critical and high severity failed checks for top remediation list
+        top_remediation_items = []
+        for assessment_name, assessment in assessment_results.items():
+            for check in assessment.get("checks", []):
+                if not check.get("passed", False):
+                    severity = check.get("severity", "")
+                    if severity in ["Critical", "High"]:
+                        top_remediation_items.append({
+                            "name": check.get("name", ""),
+                            "severity": severity,
+                            "recommendation": check.get("recommendation", ""),
+                            "assessment": assessment.get("name", assessment_name)
+                        })
+        
+        # Sort by severity (Critical first, then High)
+        top_remediation_items.sort(key=lambda x: 0 if x["severity"] == "Critical" else 1)
+        
+        # Add top 5 items to remediation list
+        for item in top_remediation_items[:5]:
+            severity_class = "severity-critical" if item["severity"] == "Critical" else "severity-high"
+            html_parts.append(f"            <li class='{severity_class}'><strong>{html.escape(item['assessment'])}: {html.escape(item['name'])}</strong> - {html.escape(item['recommendation'])}</li>")
+        
+        # Close the remediation list
+        html_parts.append("        </ol>")
+        html_parts.append("    </div>")
         
         # Add assessment results
         for assessment_name, assessment in assessment_results.items():
@@ -201,18 +236,39 @@ class ReportGenerator:
                         "        <tr>",
                         "            <td colspan='4'>",
                         "                <div class='details-container'>",
-                        f"                    <p><strong>Recommendation:</strong> {html.escape(check.get('recommendation', ''))}</p>",
+                        "                    <div class='recommendation-box'>",
+                        f"                        <h3>🔧 Remediation Steps</h3>",
+                        f"                        <p>{html.escape(check.get('recommendation', ''))}</p>",
+                        "                    </div>",
                     ])
+                    
+                    # Add steps list if details has recommendations field
+                    if check.get("details") and isinstance(check.get("details"), dict) and "recommendations" in check.get("details", {}):
+                        html_parts.extend([
+                            "                    <div class='recommendation-box'>",
+                            "                        <h3>📋 Specific Steps</h3>",
+                            "                        <ol>"
+                        ])
+                        
+                        for rec in check.get("details", {}).get("recommendations", []):
+                            html_parts.append(f"                            <li>{html.escape(rec)}</li>")
+                        
+                        html_parts.append("                        </ol>")
+                        html_parts.append("                    </div>")
                     
                     # Add reference if available
                     if check.get("reference_url"):
-                        html_parts.append(f"                    <p><strong>Reference:</strong> <a href='{check.get('reference_url')}' target='_blank'>{check.get('reference_url')}</a></p>")
+                        html_parts.extend([
+                            "                    <div class='reference-box'>",
+                            f"                        <p><strong>📚 Reference Documentation:</strong> <a href='{check.get('reference_url')}' target='_blank'>{check.get('reference_url')}</a></p>",
+                            "                    </div>"
+                        ])
                     
                     # Add details button if there are details
                     if check.get("details"):
                         check_id = f"check_{assessment_name}_{check.get('name', '').replace(' ', '_').lower()}"
                         html_parts.extend([
-                            f"                    <button class='collapsible'>Show Technical Details</button>",
+                            f"                    <button class='collapsible'>🔍 Show Technical Details</button>",
                             f"                    <div class='content'>",
                             f"                        <pre>{html.escape(json.dumps(check.get('details', {}), indent=2, default=str))}</pre>",
                             f"                    </div>"
@@ -261,12 +317,56 @@ class ReportGenerator:
         """
         report_file = os.path.join(self.output_dir, f"adseceval_report_{timestamp}.json")
         
-        # Add metadata
+        # Calculate summary statistics
+        total_checks = 0
+        total_passed = 0
+        total_failed = 0
+        severity_counts = {
+            "Critical": 0,
+            "High": 0,
+            "Medium": 0,
+            "Low": 0,
+            "Informational": 0
+        }
+        
+        # Add metadata and collect remediation items
+        top_remediation_items = []
+        for assessment_name, assessment in assessment_results.items():
+            for check in assessment.get("checks", []):
+                total_checks += 1
+                if check.get("passed", False):
+                    total_passed += 1
+                else:
+                    total_failed += 1
+                    severity = check.get("severity", "Informational")
+                    severity_counts[severity] = severity_counts.get(severity, 0) + 1
+                    
+                    top_remediation_items.append({
+                        "name": check.get("name", ""),
+                        "severity": severity,
+                        "recommendation": check.get("recommendation", ""),
+                        "reference_url": check.get("reference_url", ""),
+                        "assessment": assessment.get("name", assessment_name),
+                        "specific_steps": check.get("details", {}).get("recommendations", []) 
+                            if isinstance(check.get("details"), dict) else []
+                    })
+        
+        # Sort by severity (Critical first, then High, Medium, etc.)
+        severity_order = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3, "Informational": 4}
+        top_remediation_items.sort(key=lambda x: severity_order.get(x["severity"], 5))
+        
         report_data = {
             "metadata": {
                 "generated_at": datetime.now().isoformat(),
-                "tool_version": "0.1.0"
+                "tool_version": "0.1.0",
+                "summary": {
+                    "total_checks": total_checks,
+                    "passed": total_passed,
+                    "failed": total_failed,
+                    "severity_counts": severity_counts
+                }
             },
+            "remediation_plan": top_remediation_items,
             "results": assessment_results
         }
         
