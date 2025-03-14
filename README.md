@@ -209,6 +209,7 @@ This project is available under the MIT License.
 
 This project was inspired by various AD security assessment methodologies:
 
+- [CISA's ScubaGear](https://github.com/cisagov/ScubaGear)
 - Microsoft Active Directory security best practices
 - CIS benchmarks
 - NIST guidelines
