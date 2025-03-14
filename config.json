@@ -1,0 +1,18 @@
+{
+    "domain": {
+        "name": "RELECKER.com",
+        "server": "10.0.0.227",
+        "port": 389,
+        "use_ssl": false,
+        "use_tls": true
+    },
+    "auth": {
+        "username": "RELECKER\\ian",
+        "password_env": "ADSECEVAL_PASSWORD",
+        "use_kerberos": false
+    },
+    "reporting": {
+        "output_dir": "./test_reports",
+        "formats": ["html", "json"]
+    }
+}

@@ -1,0 +1,884 @@
+{
+  "metadata": {
+    "generated_at": "2025-03-14T11:37:11.383241",
+    "tool_version": "0.1.0"
+  },
+  "results": {
+    "Privileged Accounts Security Assessment": {
+      "name": "Privileged Accounts Security Assessment",
+      "description": "Evaluates the security configuration of privileged accounts in Active Directory",
+      "status": "critical",
+      "summary": {
+        "total_checks": 6,
+        "passed_checks": 5,
+        "failed_checks": 1,
+        "by_severity": {
+          "Critical": 1,
+          "High": 0,
+          "Medium": 0,
+          "Low": 0,
+          "Informational": 0
+        }
+      },
+      "checks": [
+        {
+          "name": "Domain Admin Count",
+          "description": "Checks if the number of domain administrator accounts is within recommended limits",
+          "severity": "Critical",
+          "passed": false,
+          "details": {
+            "Domain Admins": {
+              "count": 0,
+              "members": []
+            },
+            "Schema Admins": {
+              "count": 0,
+              "members": []
+            },
+            "Administrators": {
+              "count": 0,
+              "members": []
+            },
+            "Enterprise Admins": {
+              "count": 0,
+              "members": []
+            },
+            "total_unique_admins": 0,
+            "unique_admins": []
+          },
+          "recommendation": "Limit the number of Domain Administrators to 2-4 carefully managed accounts",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/appendix-b--privileged-accounts-and-groups-in-active-directory"
+        },
+        {
+          "name": "Dormant Admin Accounts",
+          "description": "Checks for dormant administrator accounts that may pose a security risk",
+          "severity": "High",
+          "passed": true,
+          "details": {
+            "total_admin_accounts": 0,
+            "dormant_accounts": 0,
+            "active_accounts": 0,
+            "dormant_threshold_days": 60,
+            "dormant_admins": []
+          },
+          "recommendation": "Disable or remove dormant administrator accounts that haven't been used within the last 60 days",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/monitoring-active-directory-for-signs-of-compromise"
+        },
+        {
+          "name": "Service Account Privileges",
+          "description": "Checks if service accounts have excessive privileges",
+          "severity": "High",
+          "passed": true,
+          "details": {
+            "privileged_service_accounts": 0,
+            "account_details": []
+          },
+          "recommendation": "Remove service accounts from privileged groups and implement managed service accounts or group managed service accounts",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/security/group-managed-service-accounts/group-managed-service-accounts-overview"
+        },
+        {
+          "name": "Nested Privileged Groups",
+          "description": "Checks for nested group memberships in privileged groups which can obscure privilege paths",
+          "severity": "Medium",
+          "passed": true,
+          "details": {
+            "total_nested_groups": 0,
+            "nested_groups_by_privileged_group": {}
+          },
+          "recommendation": "Remove nested groups from privileged groups to maintain clear privilege paths and reduce attack surface",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/appendix-c--protected-accounts-and-groups-in-active-directory"
+        },
+        {
+          "name": "Protected Users Group Membership",
+          "description": "Checks if privileged accounts are members of the Protected Users group",
+          "severity": "High",
+          "passed": true,
+          "details": {
+            "total_admin_accounts": 0,
+            "protected_admin_accounts": 0,
+            "unprotected_admin_accounts": 0,
+            "unprotected_admins": []
+          },
+          "recommendation": "Add all privileged accounts to the Protected Users group to provide additional security protections",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/protected-users-security-group"
+        },
+        {
+          "name": "Admin MFA Enforcement",
+          "description": "Checks if multi-factor authentication is enforced for administrative accounts",
+          "severity": "Critical",
+          "passed": true,
+          "details": {
+            "total_admin_accounts": 0,
+            "admins_with_smart_card": 0,
+            "admins_without_smart_card": 0,
+            "note": "This check uses smart card requirement as a proxy for MFA. Complete MFA status may require checking additional systems.",
+            "admins_without_mfa": []
+          },
+          "recommendation": "Configure all administrative accounts to require multi-factor authentication",
+          "reference_url": "https://docs.microsoft.com/en-us/azure/active-directory/authentication/howto-mfa-getstarted"
+        }
+      ]
+    },
+    "Password Policy Security Assessment": {
+      "name": "Password Policy Security Assessment",
+      "description": "Evaluates the security configuration of password policies in Active Directory",
+      "status": "info",
+      "summary": {
+        "total_checks": 1,
+        "passed_checks": 0,
+        "failed_checks": 1,
+        "by_severity": {
+          "Critical": 0,
+          "High": 0,
+          "Medium": 0,
+          "Low": 0,
+          "Informational": 1
+        }
+      },
+      "checks": [
+        {
+          "name": "Fine-Grained Password Policies",
+          "description": "Checks if fine-grained password policies are used for different security requirements",
+          "severity": "Informational",
+          "passed": false,
+          "details": {
+            "policy_count": 0,
+            "policies": []
+          },
+          "recommendation": "Consider implementing fine-grained password policies for different user groups, especially for privileged accounts",
+          "reference_url": "https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/fine-grained-password-policies"
+        }
+      ]
+    },
+    "Domain Controller Security Assessment": {
+      "name": "Domain Controller Security Assessment",
+      "description": "Evaluates the security configuration of domain controllers in the Active Directory environment",
+      "status": "critical",
+      "summary": {
+        "total_checks": 5,
+        "passed_checks": 3,
+        "failed_checks": 2,
+        "by_severity": {
+          "Critical": 0,
+          "High": 1,
+          "Medium": 1,
+          "Low": 0,
+          "Informational": 0
+        }
+      },
+      "checks": [
+        {
+          "name": "Domain Controller OS Versions",
+          "description": "Checks if domain controllers are running supported operating system versions",
+          "severity": "Critical",
+          "passed": true,
+          "details": {
+            "domain_controllers": {
+              "RELECKER-DC1": {
+                "operating_system": "Windows Server 2022 Standard",
+                "supported": true
+              },
+              "DC2": {
+                "operating_system": "Windows Server 2019 Standard",
+                "supported": true
+              }
+            },
+            "unsupported_count": 0,
+            "unsupported_dcs": []
+          },
+          "recommendation": "Upgrade all domain controllers to Windows Server 2016 or newer",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/get-started/windows-server-release-info"
+        },
+        {
+          "name": "LDAP Security Configuration",
+          "description": "Checks if LDAP signing and LDAPS are properly configured on domain controllers",
+          "severity": "High",
+          "passed": true,
+          "details": {
+            "domain_controllers_ldaps": {
+              "RELECKER-DC1": {
+                "hostname": "Relecker-DC1.relecker.com",
+                "encryption_types": {
+                  "DES": false,
+                  "DES_CRC": false,
+                  "RC4_HMAC": true,
+                  "AES128_CTS_HMAC_SHA1": true,
+                  "AES256_CTS_HMAC_SHA1": true
+                },
+                "has_strong_encryption": true,
+                "ldaps_available": true
+              },
+              "DC2": {
+                "hostname": "DC2.relecker.com",
+                "encryption_types": {
+                  "DES": false,
+                  "DES_CRC": false,
+                  "RC4_HMAC": true,
+                  "AES128_CTS_HMAC_SHA1": true,
+                  "AES256_CTS_HMAC_SHA1": true
+                },
+                "has_strong_encryption": true,
+                "ldaps_available": true
+              }
+            },
+            "ldaps_not_enforced_count": 0,
+            "ldaps_not_enforced": [],
+            "note": "Complete LDAP signing requirements check requires inspection of domain controller registry settings"
+          },
+          "recommendation": "Configure LDAP signing requirements to 'Require signing', enable LDAPS on all domain controllers, and disable weak encryption types",
+          "reference_url": "https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/domain-controller-ldap-server-signing-requirements"
+        },
+        {
+          "name": "SMB Signing Configuration",
+          "description": "Checks if SMB signing is properly configured on domain controllers",
+          "severity": "High",
+          "passed": null,
+          "details": {
+            "domain_controllers": [
+              "RELECKER-DC1",
+              "DC2"
+            ],
+            "note": "SMB signing verification requires direct access to domain controllers or querying Windows registry settings, which cannot be done via LDAP",
+            "recommendation": "Use additional tools (like CIS benchmarks scanners) to verify SMB signing on these domain controllers"
+          },
+          "recommendation": "Configure 'Microsoft network server: Digitally sign communications (always)' to 'Enabled' for all domain controllers",
+          "reference_url": "https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/microsoft-network-server-digitally-sign-communications-always"
+        },
+        {
+          "name": "DNS Security Configuration",
+          "description": "Partial check of DNS security settings via LDAP - full check requires direct DNS server access",
+          "severity": "Medium",
+          "passed": null,
+          "details": {
+            "dns_servers": [
+              {
+                "name": "RELECKER-DC1",
+                "hostname": "Relecker-DC1.relecker.com"
+              },
+              {
+                "name": "DC2",
+                "hostname": "DC2.relecker.com"
+              }
+            ],
+            "dns_zones": [
+              {
+                "name": "relecker.com",
+                "dnssec_enabled": false,
+                "secure_updates": false
+              },
+              {
+                "name": "RootDNSServers",
+                "dnssec_enabled": false,
+                "secure_updates": false
+              }
+            ],
+            "note": "Complete DNS security verification requires direct access to DNS servers, which cannot be fully assessed via LDAP"
+          },
+          "recommendation": "Enable DNSSEC, configure secure DNS updates, and implement DNS logging on all domain controllers",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/networking/dns/deploy/dnssec"
+        },
+        {
+          "name": "FSMO Roles Configuration",
+          "description": "Checks if FSMO roles are properly configured and distributed",
+          "severity": "Medium",
+          "passed": true,
+          "details": {
+            "fsmo_roles": {
+              "schema_master": "CN=NTDS Settings,CN=RELECKER-DC1,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=relecker,DC=com",
+              "domain_naming_master": "CN=NTDS Settings,CN=RELECKER-DC1,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=relecker,DC=com",
+              "infrastructure_master": "CN=NTDS Settings,CN=RELECKER-DC1,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=relecker,DC=com",
+              "rid_master": "CN=NTDS Settings,CN=RELECKER-DC1,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=relecker,DC=com",
+              "pdc_emulator": "CN=NTDS Settings,CN=RELECKER-DC1,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=relecker,DC=com"
+            },
+            "fsmo_servers": [
+              "NTDS Settings"
+            ],
+            "role_count": 5,
+            "is_consolidated": true
+          },
+          "recommendation": "Ensure FSMO roles are assigned to properly secured domain controllers. For smaller environments, consolidate roles on 1-2 DCs; for larger environments, consider distributing roles according to a designed topology.",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/planning-operations-master-role-placement"
+        }
+      ]
+    },
+    "Trust Relationships Security Assessment": {
+      "name": "Trust Relationships Security Assessment",
+      "description": "Evaluates the security configuration of trust relationships in the Active Directory environment",
+      "status": "passed",
+      "summary": {
+        "total_checks": 5,
+        "passed_checks": 5,
+        "failed_checks": 0,
+        "by_severity": {
+          "Critical": 0,
+          "High": 0,
+          "Medium": 0,
+          "Low": 0,
+          "Informational": 0
+        }
+      },
+      "checks": [
+        {
+          "name": "Trust Relationship Inventory",
+          "description": "Creates an inventory of all trust relationships in the Active Directory environment",
+          "severity": "Informational",
+          "passed": true,
+          "details": {
+            "trust_count": 0,
+            "trusts": {}
+          },
+          "recommendation": "Review all trust relationships regularly and remove any that are not necessary",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understanding-trust-relationships"
+        },
+        {
+          "name": "SID Filtering on External Trusts",
+          "description": "Checks if SID filtering is enabled on external trusts to prevent SID history attacks",
+          "severity": "High",
+          "passed": true,
+          "details": {
+            "external_trust_count": 0,
+            "external_trusts": [],
+            "trusts_without_sid_filtering": [],
+            "note": "SID filtering check is simplified in this version"
+          },
+          "recommendation": "Enable SID filtering on all external trusts to prevent SID history attacks",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/manage/security-considerations-for-trusts"
+        },
+        {
+          "name": "Transitive Trust Relationships",
+          "description": "Checks for transitive trust relationships that could pose security risks",
+          "severity": "Medium",
+          "passed": true,
+          "details": {
+            "transitive_trust_count": 0,
+            "transitive_trusts": []
+          },
+          "recommendation": "Review all transitive trusts and consider making them non-transitive where appropriate",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/manage/forest-design-models"
+        },
+        {
+          "name": "External Trust Security",
+          "description": "Checks for external trusts and evaluates their security configuration",
+          "severity": "High",
+          "passed": true,
+          "details": {
+            "external_trust_count": 0,
+            "external_trusts": []
+          },
+          "recommendation": "Configure all external trusts to be non-transitive and enable selective authentication",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/manage/security-considerations-for-trusts"
+        },
+        {
+          "name": "Forest Trust Security",
+          "description": "Checks for forest trusts and evaluates their security configuration",
+          "severity": "High",
+          "passed": true,
+          "details": {
+            "forest_trust_count": 0,
+            "forest_trusts": []
+          },
+          "recommendation": "Enable selective authentication and maintain SID filtering on all forest trusts",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/manage/forest-design-models"
+        }
+      ]
+    },
+    "Authentication Protocols Security Assessment": {
+      "name": "Authentication Protocols Security Assessment",
+      "description": "Evaluates the security configuration of authentication protocols and mechanisms in Active Directory",
+      "status": "critical",
+      "summary": {
+        "total_checks": 5,
+        "passed_checks": 2,
+        "failed_checks": 3,
+        "by_severity": {
+          "Critical": 0,
+          "High": 3,
+          "Medium": 0,
+          "Low": 0,
+          "Informational": 0
+        }
+      },
+      "checks": [
+        {
+          "name": "NTLM Restriction",
+          "description": "Checks if NTLM authentication is restricted in the domain",
+          "severity": "High",
+          "passed": null,
+          "details": {
+            "gpo_count": 3,
+            "note": "Complete NTLM restriction validation requires policy analysis. Verify the following settings:",
+            "recommendations": [
+              "Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers = 'Deny all'",
+              "Network security: Restrict NTLM: NTLM authentication in this domain = 'Deny all'",
+              "Network security: Restrict NTLM: Add remote server exceptions for NTLM authentication = 'None'"
+            ],
+            "gpo_list": [
+              {
+                "name": "Default Domain Policy",
+                "path": "\\\\relecker.com\\sysvol\\relecker.com\\Policies\\{31B2F340-016D-11D2-945F-00C04FB984F9}"
+              },
+              {
+                "name": "Default Domain Controllers Policy",
+                "path": "\\\\relecker.com\\sysvol\\relecker.com\\Policies\\{6AC1786C-016F-11D2-945F-00C04fB984F9}"
+              },
+              {
+                "name": "Map Drives",
+                "path": "\\\\relecker.com\\SysVol\\relecker.com\\Policies\\{DEB53A7B-B833-4A70-A1C0-F7285D54E2FF}"
+              }
+            ]
+          },
+          "recommendation": "Configure NTLM restriction policies to limit legacy authentication protocols",
+          "reference_url": "https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/network-security-restrict-ntlm-ntlm-authentication-in-this-domain"
+        },
+        {
+          "name": "Kerberos Encryption Configuration",
+          "description": "Checks if secure Kerberos encryption types are configured",
+          "severity": "High",
+          "passed": true,
+          "details": {
+            "domain_controllers": 2,
+            "des_disabled": true,
+            "rc4_only": false,
+            "aes_enabled": true,
+            "weak_encryption_dcs": [],
+            "recommendations": [
+              "Disable DES encryption types",
+              "Enable AES encryption types",
+              "Consider disabling RC4 after ensuring all systems support AES"
+            ]
+          },
+          "recommendation": "Configure Kerberos to use only strong encryption types (AES) and disable weak encryption types (DES, RC4)",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/security/kerberos/kerberos-authentication-overview"
+        },
+        {
+          "name": "Windows Defender Credential Guard",
+          "description": "Checks if Windows Defender Credential Guard is configured",
+          "severity": "High",
+          "passed": null,
+          "details": {
+            "note": "Windows Defender Credential Guard configuration requires GPO analysis",
+            "recommendations": [
+              "Enable Virtualization-based security",
+              "Enable Credential Guard with UEFI lock",
+              "Use Group Policy: Computer Configuration > Administrative Templates > System > Device Guard > Turn On Virtualization Based Security"
+            ]
+          },
+          "recommendation": "Enable Windows Defender Credential Guard to protect credentials from theft",
+          "reference_url": "https://docs.microsoft.com/en-us/windows/security/identity-protection/credential-guard/credential-guard"
+        },
+        {
+          "name": "Local Administrator Password Solution (LAPS)",
+          "description": "Checks if LAPS is implemented to manage local administrator passwords",
+          "severity": "High",
+          "passed": false,
+          "details": {
+            "laps_schema_extensions": [],
+            "schema_extensions_count": 0,
+            "computer_sample_size": 0,
+            "computers_with_laps": 0,
+            "laps_implemented": false,
+            "recommendations": [
+              "Deploy LAPS to manage local administrator passwords",
+              "Ensure LAPS GPO settings are applied to all workstations and servers",
+              "Regularly audit LAPS permissions to ensure proper access controls"
+            ]
+          },
+          "recommendation": "Implement LAPS to securely manage and rotate local administrator passwords",
+          "reference_url": "https://docs.microsoft.com/en-us/defender-for-identity/security-assessment-laps"
+        },
+        {
+          "name": "Kerberos Delegation Security",
+          "description": "Checks for insecure Kerberos delegation configurations",
+          "severity": "Critical",
+          "passed": true,
+          "details": {
+            "unconstrained_delegation_count": 0,
+            "constrained_delegation_count": 0,
+            "resource_based_delegation_count": 0,
+            "sensitive_accounts_with_delegation": 0,
+            "unconstrained_delegation_computers": [],
+            "sensitive_accounts": [],
+            "recommendations": [
+              "Replace unconstrained delegation with constrained delegation",
+              "Configure 'Account is sensitive and cannot be delegated' for privileged accounts",
+              "Regularly audit delegation configurations"
+            ]
+          },
+          "recommendation": "Replace unconstrained delegation with constrained delegation and protect sensitive accounts from delegation",
+          "reference_url": "https://docs.microsoft.com/en-us/windows-server/security/kerberos/kerberos-constrained-delegation-overview"
+        }
+      ]
+    },
+    "Tiered Administration Model Assessment": {
+      "name": "Tiered Administration Model Assessment",
+      "description": "Evaluates the implementation of a tiered administration model in Active Directory",
+      "status": "critical",
+      "summary": {
+        "total_checks": 5,
+        "passed_checks": 2,
+        "failed_checks": 3,
+        "by_severity": {
+          "Critical": 0,
+          "High": 2,
+          "Medium": 1,
+          "Low": 0,
+          "Informational": 0
+        }
+      },
+      "checks": [
+        {
+          "name": "Administrative Tier Separation",
+          "description": "Checks if administrative tiers are properly implemented and separated",
+          "severity": "Critical",
+          "passed": true,
+          "details": {
+            "tiered_model_detected": true,
+            "tier0_groups": 4,
+            "tier1_groups": 0,
+            "tier2_groups": 0,
+            "tier_violations": 0,
+            "violations": [],
+            "tier_groups": {
+              "tier0": [
+                {
+                  "name": "Administrators",
+                  "members": 3,
+                  "distinguishedName": "",
+                  "note": "Well-known administrative group"
+                },
+                {
+                  "name": "Domain Admins",
+                  "members": 2,
+                  "distinguishedName": "",
+                  "note": "Well-known administrative group"
+                },
+                {
+                  "name": "Schema Admins",
+                  "members": 1,
+                  "distinguishedName": "",
+                  "note": "Well-known administrative group"
+                },
+                {
+                  "name": "Enterprise Admins",
+                  "members": 1,
+                  "distinguishedName": "",
+                  "note": "Well-known administrative group"
+                }
+              ],
+              "tier1": [],
+              "tier2": []
+            }
+          },
+          "recommendation": "Implement proper tiered administration model with clear separation between tiers",
+          "reference_url": "https://docs.microsoft.com/en-us/security/compass/privileged-access-access-model"
+        },
+        {
+          "name": "Privileged Access Workstations (PAWs)",
+          "description": "Checks if Privileged Access Workstations are implemented for administrative tasks",
+          "severity": "High",
+          "passed": false,
+          "details": {
+            "paw_implemented": false,
+            "paw_computers_found": 0,
+            "paw_groups_found": 0,
+            "paw_computers": [],
+            "paw_groups": [],
+            "recommendations": [
+              "Implement PAWs for Tier 0 administrators",
+              "Configure Device Guard and Credential Guard on PAWs",
+              "Restrict network access from PAWs to only required resources",
+              "Implement jump servers for Tier 1 and Tier 2 administration"
+            ]
+          },
+          "recommendation": "Implement Privileged Access Workstations for administrative activities, especially for Tier 0 administrators",
+          "reference_url": "https://docs.microsoft.com/en-us/security/compass/privileged-access-devices"
+        },
+        {
+          "name": "Tier 0 Asset Security",
+          "description": "Checks security of Tier 0 assets and accounts",
+          "severity": "Critical",
+          "passed": true,
+          "details": {
+            "tier0_accounts": 0,
+            "tier0_account_issues": 0,
+            "domain_controllers": 2,
+            "dc_security_issues": 0,
+            "account_issues": [],
+            "dc_issues": [],
+            "recommendations": [
+              "Require smart cards for all Tier 0 administrators",
+              "Mark all Tier 0 accounts as sensitive and cannot be delegated",
+              "Implement just-in-time (JIT) administration for Tier 0 access",
+              "Upgrade domain controllers to latest supported OS version",
+              "Implement LAPS for local admin passwords on all Tier 0 systems"
+            ]
+          },
+          "recommendation": "Implement enhanced security controls for all Tier 0 assets and accounts",
+          "reference_url": "https://docs.microsoft.com/en-us/security/compass/privileged-access-security-baselines"
+        },
+        {
+          "name": "Lateral Movement Paths",
+          "description": "Checks for potential lateral movement paths between administrative tiers",
+          "severity": "High",
+          "passed": null,
+          "details": {
+            "admin_group_members": [
+              "Administrator",
+              "Enterprise Admins",
+              "Domain Admins"
+            ],
+            "excessive_rights_groups": 0,
+            "lateral_movement_risks": [],
+            "recommendations": [
+              "Implement clean-source principle for administration",
+              "Remove unnecessary administrators from local admin groups",
+              "Implement LAPS to manage local administrator passwords",
+              "Use jump servers for cross-tier administration",
+              "Implement network segmentation between tiers"
+            ],
+            "notes": [
+              "A comprehensive lateral movement analysis requires detailed assessment of permissions and group memberships",
+              "Consider using tools like BloodHound for detailed analysis of attack paths"
+            ]
+          },
+          "recommendation": "Analyze and eliminate lateral movement paths between tiers by implementing proper network segmentation and JIT administration",
+          "reference_url": "https://docs.microsoft.com/en-us/security/compass/privileged-access-access-model"
+        },
+        {
+          "name": "Just-In-Time Administration",
+          "description": "Checks if just-in-time (JIT) administration is implemented",
+          "severity": "Medium",
+          "passed": false,
+          "details": {
+            "jit_likely_implemented": false,
+            "potential_jit_groups": 0,
+            "jit_groups": [],
+            "jit_options": [
+              "Microsoft Identity Manager (MIM) Privileged Access Management (PAM)",
+              "Azure AD Privileged Identity Management (PIM)",
+              "Custom JIT solutions using temporary group memberships",
+              "Third-party privileged access management solutions"
+            ],
+            "recommendations": [
+              "Implement just-in-time administration for all privileged access",
+              "Use time-bound and approval-based elevation of privileges",
+              "Enable comprehensive auditing for all privileged access",
+              "Consider Azure AD PIM if using hybrid or cloud environment"
+            ]
+          },
+          "recommendation": "Implement just-in-time administration to minimize standing privileges and reduce attack surface",
+          "reference_url": "https://docs.microsoft.com/en-us/security/compass/privileged-access-deployment"
+        }
+      ]
+    },
+    "Active Directory Certificate Services Security Assessment": {
+      "name": "Active Directory Certificate Services Security Assessment",
+      "description": "Evaluates the security configuration of Active Directory Certificate Services (ADCS)",
+      "status": "critical",
+      "summary": {
+        "total_checks": 5,
+        "passed_checks": 1,
+        "failed_checks": 4,
+        "by_severity": {
+          "Critical": 2,
+          "High": 2,
+          "Medium": 0,
+          "Low": 0,
+          "Informational": 0
+        }
+      },
+      "checks": [
+        {
+          "name": "Certificate Authority Discovery",
+          "description": "Discovers Certificate Authorities in the Active Directory environment",
+          "severity": "Informational",
+          "passed": true,
+          "details": {
+            "ca_servers_found": 2,
+            "enterprise_cas": 2,
+            "standalone_cas": 0,
+            "enterprise_ca_list": [
+              {
+                "name": "relecker-RELECKER-DC1-CA",
+                "hostname": "Relecker-DC1.relecker.com",
+                "created": [
+                  "2024-08-24 18:43:11+00:00"
+                ],
+                "templates": 11
+              },
+              {
+                "name": "relecker-CA",
+                "hostname": "DC2.relecker.com",
+                "created": [
+                  "2024-10-11 23:15:23+00:00"
+                ],
+                "templates": 12
+              }
+            ],
+            "standalone_ca_list": [],
+            "nt_auth_certs_found": true
+          },
+          "recommendation": "Document all Certificate Authorities and ensure they are properly secured",
+          "reference_url": "https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/network-security-certificate-services-client-authentication"
+        },
+        {
+          "name": "Vulnerable Certificate Templates",
+          "description": "Checks for vulnerable certificate templates that could be exploited for privilege escalation",
+          "severity": "Critical",
+          "passed": false,
+          "details": {
+            "total_templates": 33,
+            "vulnerable_templates": 11,
+            "template_issues": [
+              {
+                "name": "EnrollmentAgentOffline",
+                "vulnerabilities": [
+                  "ESC1: Template allows requesters to specify subject alternative names"
+                ]
+              },
+              {
+                "name": "WebServer",
+                "vulnerabilities": [
+                  "ESC1: Template allows requesters to specify subject alternative names"
+                ]
+              },
+              {
+                "name": "CA",
+                "vulnerabilities": [
+                  "ESC1: Template allows requesters to specify subject alternative names"
+                ]
+              },
+              {
+                "name": "SubCA",
+                "vulnerabilities": [
+                  "ESC1: Template allows requesters to specify subject alternative names"
+                ]
+              },
+              {
+                "name": "IPSECIntermediateOffline",
+                "vulnerabilities": [
+                  "ESC1: Template allows requesters to specify subject alternative names"
+                ]
+              },
+              {
+                "name": "OfflineRouter",
+                "vulnerabilities": [
+                  "ESC1: Template allows requesters to specify subject alternative names",
+                  "ESC4: Template has client authentication EKU and allows requesters to specify subject"
+                ]
+              },
+              {
+                "name": "CEPEncryption",
+                "vulnerabilities": [
+                  "ESC1: Template allows requesters to specify subject alternative names"
+                ]
+              },
+              {
+                "name": "ExchangeUser",
+                "vulnerabilities": [
+                  "ESC1: Template allows requesters to specify subject alternative names"
+                ]
+              },
+              {
+                "name": "ExchangeUserSignature",
+                "vulnerabilities": [
+                  "ESC1: Template allows requesters to specify subject alternative names"
+                ]
+              },
+              {
+                "name": "CrossCA",
+                "vulnerabilities": [
+                  "ESC1: Template allows requesters to specify subject alternative names",
+                  "ESC3: Template enables certificate request agent"
+                ]
+              },
+              {
+                "name": "CAExchange",
+                "vulnerabilities": [
+                  "ESC1: Template allows requesters to specify subject alternative names"
+                ]
+              }
+            ],
+            "recommendations": [
+              "Disable or secure templates that allow requesters to specify subject alternative names",
+              "Remove client authentication EKU from templates that allow requesters to specify subject",
+              "Restrict enrollment permissions on vulnerable templates",
+              "Consider using custom templates with stricter security settings"
+            ]
+          },
+          "recommendation": "Disable or secure vulnerable certificate templates that could allow privilege escalation",
+          "reference_url": "https://posts.specterops.io/certified-pre-owned-d95910965cd2"
+        },
+        {
+          "name": "Certificate Enrollment Permissions",
+          "description": "Checks certificate enrollment permissions for overly permissive settings",
+          "severity": "High",
+          "passed": null,
+          "details": {
+            "note": "Comprehensive enrollment permission checking requires deep ACL analysis",
+            "recommendations": [
+              "Restrict enrollment permissions to only necessary users and groups",
+              "Review all certificate template ACLs for overly permissive settings",
+              "Remove enrollment rights for Authenticated Users and Domain Users",
+              "Implement approval requirements for sensitive certificate templates",
+              "Consider using tools like Certify or PKI Health Tool for detailed analysis"
+            ]
+          },
+          "recommendation": "Review and restrict certificate enrollment permissions to prevent unauthorized certificate issuance",
+          "reference_url": "https://learn.microsoft.com/en-us/windows/security/identity-protection/access-control/access-control"
+        },
+        {
+          "name": "Insecure Cryptographic Settings",
+          "description": "Checks for insecure cryptographic settings in Active Directory Certificate Services",
+          "severity": "High",
+          "passed": null,
+          "details": {
+            "ca_servers": 2,
+            "note": "Comprehensive cryptographic security assessment requires certificate and CA configuration analysis",
+            "recommendations": [
+              "Ensure all CA certificates use RSA keys of at least 2048 bits or ECC keys of at least 256 bits",
+              "Use SHA-256 or stronger hashing algorithms for all certificates",
+              "Disable MD5 and SHA-1 hashing algorithms on all CAs",
+              "Configure strong key protection on CA private keys",
+              "Implement key recovery agents for critical certificates"
+            ]
+          },
+          "recommendation": "Configure strong cryptographic settings on all Certificate Authorities",
+          "reference_url": "https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/system-cryptography-use-fips-compliant-algorithms-for-encryption-hashing-and-signing"
+        },
+        {
+          "name": "CA Server Security",
+          "description": "Checks security settings on Certificate Authority servers",
+          "severity": "Critical",
+          "passed": null,
+          "details": {
+            "ca_servers": [
+              {
+                "name": "relecker-RELECKER-DC1-CA",
+                "hostname": "Relecker-DC1.relecker.com"
+              },
+              {
+                "name": "relecker-CA",
+                "hostname": "DC2.relecker.com"
+              }
+            ],
+            "note": "Comprehensive CA server security assessment requires direct access to CA servers",
+            "recommendations": [
+              "Run enterprise CAs on dedicated servers that are domain members",
+              "Run standalone CAs on dedicated servers that are not domain members",
+              "Implement physical and logical security controls for CA servers",
+              "Store CA private keys in hardware security modules (HSMs)",
+              "Configure proper CA backup and recovery procedures",
+              "Implement role separation for CA administrators",
+              "Configure proper audit logging for all CA activities",
+              "Implement network segmentation for CA servers",
+              "Keep CA servers updated with security patches"
+            ]
+          },
+          "recommendation": "Implement comprehensive security controls for all Certificate Authority servers",
+          "reference_url": "https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn786426(v=ws.11)"
+        }
+      ]
+    }
+  }
+}
