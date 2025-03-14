@@ -254,11 +254,16 @@ class AuthProtocolsAssessment(AssessmentBase):
                 schema_entries.append(attr)
         
         # Check if computers have LAPS attributes populated
-        computer_sample = self.client.search(
-            search_filter="(&(objectClass=computer)(!(userAccountControl:1.2.840.113556.1.4.803:=8192)))",  # Non-DC computers
-            attributes=["name", "ms-Mcs-AdmPwdExpirationTime"],
-            search_scope=ldap3.SUBTREE
-        )[:10]  # Limit to 10 computers for sample
+        try:
+            computer_sample = self.client.search(
+                search_filter="(&(objectClass=computer)(!(userAccountControl:1.2.840.113556.1.4.803:=8192)))",  # Non-DC computers
+                attributes=["name", "ms-Mcs-AdmPwdExpirationTime"],
+                search_scope=ldap3.SUBTREE
+            )[:10]  # Limit to 10 computers for sample
+        except ldap3.core.exceptions.LDAPAttributeError:
+            # LAPS schema extensions not installed
+            logger.warning("LAPS schema extensions not installed in the directory")
+            computer_sample = []
         
         laps_used = False
         laps_computers = 0

@@ -15,8 +15,12 @@ adseceval/assessments/__init__.py
 adseceval/assessments/adcs.py
 adseceval/assessments/auth_protocols.py
 adseceval/assessments/base.py
+adseceval/assessments/compliance.py
 adseceval/assessments/domain_controllers.py
+adseceval/assessments/exploitation.py
+adseceval/assessments/group_policy.py
 adseceval/assessments/password_policy.py
+adseceval/assessments/privileged_access.py
 adseceval/assessments/privileged_accounts.py
 adseceval/assessments/tiered_admin.py
 adseceval/assessments/trust_relationships.py
