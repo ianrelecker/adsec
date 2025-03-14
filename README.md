@@ -177,6 +177,7 @@ Documentation is located in the `docs/` directory:
 - [Setup Guide](docs/setup.md)
 - [Usage Guide](docs/usage.md)
 - [Security Concepts](docs/concepts.md)
+- [Example Report](docs/example/)
 
 ## Development and Contribution
 
