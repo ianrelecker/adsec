@@ -6,11 +6,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="adseceval",
     version="0.1.0",
-    author="ADSecEval Team",
+    author="Ian Relecker",
     description="Active Directory Security Evaluation Tool",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/ADSecEval",
+    url="https://github.com/ianrelecker/adsec",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",

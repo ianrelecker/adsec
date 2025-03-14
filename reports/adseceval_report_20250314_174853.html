@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Active Directory Security Assessment Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #333; }
+        h1, h2, h3 { color: #0066cc; }
+        h1 { border-bottom: 2px solid #0066cc; padding-bottom: 10px; }
+        .summary-box { background-color: #f5f5f5; border-radius: 5px; padding: 15px; margin: 20px 0; }
+        .severity-critical { color: #d32f2f; }
+        .severity-high { color: #f57c00; }
+        .severity-medium { color: #fbc02d; }
+        .severity-low { color: #388e3c; }
+        .severity-info { color: #0288d1; }
+        .status-passed { color: #388e3c; }
+        .status-failed { color: #d32f2f; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .details-container { margin-top: 10px; border-left: 3px solid #ddd; padding-left: 10px; }
+        .collapsible { cursor: pointer; padding: 10px; border: none; text-align: left; outline: none; width: 100%; }
+        .active, .collapsible:hover { background-color: #f1f1f1; }
+        .content { padding: 0 18px; display: none; overflow: hidden; background-color: #f9f9f9; }
+        #summary-chart { width: 100%; height: 300px; }
+    </style>
+</head>
+<body>
+    <h1>Active Directory Security Assessment Report</h1>
+    <p>Generated: 2025-03-14 17:48:53</p>
+    <div class='summary-box'>
+        <h2>Executive Summary</h2>
+        <p>Total checks: 17 (11 passed, 6 failed)</p>
+        <p>Findings by severity:</p>
+        <ul>
+            <li class='severity-critical'>Critical: 1</li>
+            <li class='severity-high'>High: 2</li>
+            <li class='severity-medium'>Medium: 2</li>
+            <li class='severity-low'>Low: 0</li>
+            <li class='severity-info'>Informational: 1</li>
+        </ul>
+    </div>
+    <h2>Privileged Accounts Security Assessment</h2>
+    <p>Evaluates the security configuration of privileged accounts in Active Directory</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Domain Admin Count</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if the number of domain administrator accounts is within recommended limits</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <p><strong>Recommendation:</strong> Limit the number of Domain Administrators to 2-4 carefully managed accounts</p>
+                    <p><strong>Reference:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/appendix-b--privileged-accounts-and-groups-in-active-directory' target='_blank'>https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/appendix-b--privileged-accounts-and-groups-in-active-directory</a></p>
+                    <button class='collapsible'>Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;Domain Admins&quot;: {
+    &quot;count&quot;: 0,
+    &quot;members&quot;: []
+  },
+  &quot;Schema Admins&quot;: {
+    &quot;count&quot;: 0,
+    &quot;members&quot;: []
+  },
+  &quot;Administrators&quot;: {
+    &quot;count&quot;: 0,
+    &quot;members&quot;: []
+  },
+  &quot;Enterprise Admins&quot;: {
+    &quot;count&quot;: 0,
+    &quot;members&quot;: []
+  },
+  &quot;total_unique_admins&quot;: 0,
+  &quot;unique_admins&quot;: []
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Dormant Admin Accounts</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks for dormant administrator accounts that may pose a security risk</td>
+        </tr>
+        <tr>
+            <td>Service Account Privileges</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if service accounts have excessive privileges</td>
+        </tr>
+        <tr>
+            <td>Nested Privileged Groups</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks for nested group memberships in privileged groups which can obscure privilege paths</td>
+        </tr>
+        <tr>
+            <td>Protected Users Group Membership</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if privileged accounts are members of the Protected Users group</td>
+        </tr>
+        <tr>
+            <td>Admin MFA Enforcement</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if multi-factor authentication is enforced for administrative accounts</td>
+        </tr>
+    </table>
+    <h2>Password Policy Security Assessment</h2>
+    <p>Evaluates the security configuration of password policies in Active Directory</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Fine-Grained Password Policies</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-informational'>Informational</td>
+            <td>Checks if fine-grained password policies are used for different security requirements</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <p><strong>Recommendation:</strong> Consider implementing fine-grained password policies for different user groups, especially for privileged accounts</p>
+                    <p><strong>Reference:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/fine-grained-password-policies' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/fine-grained-password-policies</a></p>
+                    <button class='collapsible'>Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;policy_count&quot;: 0,
+  &quot;policies&quot;: []
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <h2>Domain Controller Security Assessment</h2>
+    <p>Evaluates the security configuration of domain controllers in the Active Directory environment</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Domain Controller OS Versions</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if domain controllers are running supported operating system versions</td>
+        </tr>
+        <tr>
+            <td>LDAP Security Configuration</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if LDAP signing and LDAPS are properly configured on domain controllers</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <p><strong>Recommendation:</strong> Configure LDAP signing requirements to &#x27;Require signing&#x27; and enable LDAPS on all domain controllers</p>
+                    <p><strong>Reference:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/domain-controller-ldap-server-signing-requirements' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/domain-controller-ldap-server-signing-requirements</a></p>
+                    <button class='collapsible'>Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;domain_controllers&quot;: [
+    &quot;RELECKER-DC1&quot;,
+    &quot;DC2&quot;
+  ],
+  &quot;note&quot;: &quot;This check requires inspection of domain controller registry settings, which is not implemented via LDAP&quot;
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>SMB Signing Configuration</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if SMB signing is properly configured on domain controllers</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <p><strong>Recommendation:</strong> Configure &#x27;Microsoft network server: Digitally sign communications (always)&#x27; to &#x27;Enabled&#x27; for all domain controllers</p>
+                    <p><strong>Reference:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/microsoft-network-server-digitally-sign-communications-always' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/microsoft-network-server-digitally-sign-communications-always</a></p>
+                    <button class='collapsible'>Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;domain_controllers&quot;: [
+    &quot;RELECKER-DC1&quot;,
+    &quot;DC2&quot;
+  ],
+  &quot;note&quot;: &quot;This check requires inspection of domain controller registry settings, which is not implemented via LDAP&quot;
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>DNS Security Configuration</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks if DNS security settings are properly configured on domain controllers</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <p><strong>Recommendation:</strong> Enable DNSSEC, configure secure DNS updates, and implement DNS logging on all domain controllers</p>
+                    <p><strong>Reference:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/networking/dns/deploy/dnssec' target='_blank'>https://docs.microsoft.com/en-us/windows-server/networking/dns/deploy/dnssec</a></p>
+                    <button class='collapsible'>Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;domain_controllers&quot;: [
+    &quot;RELECKER-DC1&quot;,
+    &quot;DC2&quot;
+  ],
+  &quot;note&quot;: &quot;This check requires inspection of DNS server settings, which is not implemented via LDAP&quot;
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>FSMO Roles Configuration</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks if FSMO roles are properly configured and secured</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <p><strong>Recommendation:</strong> Ensure FSMO roles are assigned to properly secured domain controllers and consider having backup contingency plans</p>
+                    <p><strong>Reference:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/planning-operations-master-role-placement' target='_blank'>https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/planning-operations-master-role-placement</a></p>
+                    <button class='collapsible'>Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;note&quot;: &quot;This check requires querying AD for FSMO role holders, which is simplified in this version&quot;
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <h2>Trust Relationships Security Assessment</h2>
+    <p>Evaluates the security configuration of trust relationships in the Active Directory environment</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Trust Relationship Inventory</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-informational'>Informational</td>
+            <td>Creates an inventory of all trust relationships in the Active Directory environment</td>
+        </tr>
+        <tr>
+            <td>SID Filtering on External Trusts</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if SID filtering is enabled on external trusts to prevent SID history attacks</td>
+        </tr>
+        <tr>
+            <td>Transitive Trust Relationships</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks for transitive trust relationships that could pose security risks</td>
+        </tr>
+        <tr>
+            <td>External Trust Security</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks for external trusts and evaluates their security configuration</td>
+        </tr>
+        <tr>
+            <td>Forest Trust Security</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks for forest trusts and evaluates their security configuration</td>
+        </tr>
+    </table>
+    <script>
+    var coll = document.getElementsByClassName('collapsible');
+    for (var i = 0; i < coll.length; i++) {
+        coll[i].addEventListener('click', function() {
+            this.classList.toggle('active');
+            var content = this.nextElementSibling;
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+            } else {
+                content.style.display = 'block';
+            }
+        });
+    }
+    </script>
+</body>
+</html>
