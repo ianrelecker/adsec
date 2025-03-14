@@ -98,12 +98,12 @@ The tool connects to your AD environment via LDAP, performs security checks agai
 
 ## Project Status
 
-This project is **in development** and not yet ready for production use. Key points:
+This project is released as v1.0.0. Key features:
 
-- Not yet published on PyPI
-- Documentation is being developed
-- Core LDAP functionality is implemented but some assessment checks are stubs
-- Report generation is functional
+- Comprehensive documentation
+- Core LDAP functionality fully implemented
+- Extensive assessment modules
+- Advanced report generation in multiple formats
 
 ## Installation 
 
@@ -117,8 +117,8 @@ This project is **in development** and not yet ready for production use. Key poi
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ADSecEval.git
-cd ADSecEval
+git clone https://github.com/ianrelecker/adsec.git
+cd adsec
 
 # Create and activate a virtual environment (recommended)
 python -m venv venv

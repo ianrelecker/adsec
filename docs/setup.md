@@ -13,18 +13,12 @@ Before installing ADSecEval, ensure you have the following:
 
 ## Installation
 
-### Option 1: Install from PyPI (Recommended)
-
-```bash
-pip install adseceval
-```
-
-### Option 2: Install from Source
+### Install from Source
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/ADSecEval.git
-   cd ADSecEval
+   git clone https://github.com/ianrelecker/adsec.git
+   cd adsec
    ```
 
 2. Install the package:

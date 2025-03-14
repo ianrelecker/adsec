@@ -7,7 +7,7 @@ This guide explains how to use ADSecEval to assess the security of your Active D
 Once you've [installed and configured](setup.md) ADSecEval, you can run it with the default settings:
 
 ```bash
-adseceval --config config.json
+python -m adseceval.main --config config.json
 ```
 
 This will execute all enabled assessments and generate a report in the format specified in your configuration file.
@@ -17,7 +17,7 @@ This will execute all enabled assessments and generate a report in the format sp
 ADSecEval provides several command-line options to customize its behavior:
 
 ```
-usage: adseceval [options]
+usage: python -m adseceval.main [options]
 
 Active Directory Security Assessment Tool
 
@@ -37,25 +37,25 @@ options:
 Run only specific assessments:
 
 ```bash
-adseceval --config config.json --assessments privileged_accounts password_policy
+python -m adseceval.main --config config.json --assessments privileged_accounts password_policy
 ```
 
 Generate a report in JSON format:
 
 ```bash
-adseceval --config config.json --format json
+python -m adseceval.main --config config.json --format json
 ```
 
 Specify a custom output directory:
 
 ```bash
-adseceval --config config.json --output /path/to/reports
+python -m adseceval.main --config config.json --output /path/to/reports
 ```
 
 Increase logging verbosity:
 
 ```bash
-adseceval --config config.json --log-level DEBUG
+python -m adseceval.main --config config.json --log-level DEBUG
 ```
 
 ## Assessment Modules
@@ -76,13 +76,13 @@ ADSecEval includes comprehensive assessment modules, each focusing on a specific
 You can enable/disable specific assessments using command-line options:
 
 ```bash
-adseceval --config config.json --assessments privileged_accounts password_policy domain_controllers trust_relationships
+python -m adseceval.main --config config.json --assessments privileged_accounts password_policy domain_controllers trust_relationships
 ```
 
 Or enable all assessments with the `all` option:
 
 ```bash
-adseceval --config config.json --assessments all
+python -m adseceval.main --config config.json --assessments all
 ```
 
 ### Safe Mode and Exploitation Testing
@@ -90,13 +90,13 @@ adseceval --config config.json --assessments all
 The exploitation assessment module includes tests that validate vulnerabilities by attempting safe exploitation. By default, these tests run in a simulation mode that doesn't perform actual exploitation. To enable full testing:
 
 ```bash
-adseceval --config config.json --assessments exploitation --exploitation
+python -m adseceval.main --config config.json --assessments exploitation --exploitation
 ```
 
 To ensure all tests run in a completely safe mode:
 
 ```bash
-adseceval --config config.json --safe-mode
+python -m adseceval.main --config config.json --safe-mode
 ```
 
 ### Compliance Framework Selection
@@ -104,7 +104,7 @@ adseceval --config config.json --safe-mode
 You can specify which compliance frameworks to assess against:
 
 ```bash
-adseceval --config config.json --assessments compliance --compliance-framework nist
+python -m adseceval.main --config config.json --assessments compliance --compliance-framework nist
 ```
 
 Available frameworks:

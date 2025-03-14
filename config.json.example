@@ -1,0 +1,34 @@
+{
+    "domain": {
+        "name": "yourdomain.com",
+        "server": "dc01.yourdomain.com",
+        "port": 389,
+        "use_ssl": false,
+        "use_tls": true
+    },
+    "auth": {
+        "username": "domain\\username",
+        "password_env": "ADSECEVAL_PASSWORD",
+        "use_kerberos": false
+    },
+    "scan_options": {
+        "privileged_accounts": true,
+        "password_policies": true,
+        "security_groups": true,
+        "trust_relationships": true,
+        "domain_controllers": true,
+        "service_accounts": true
+    },
+    "reporting": {
+        "output_dir": "./reports",
+        "formats": ["html", "json"],
+        "include_recommendations": true,
+        "risk_threshold": "medium"
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "./logs/adseceval.log",
+        "max_size_mb": 10,
+        "backup_count": 5
+    }
+}
