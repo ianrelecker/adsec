@@ -1,0 +1,2728 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Active Directory Security Assessment Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #333; }
+        h1, h2, h3 { color: #0066cc; }
+        h1 { border-bottom: 2px solid #0066cc; padding-bottom: 10px; }
+        .summary-box { background-color: #f5f5f5; border-radius: 5px; padding: 15px; margin: 20px 0; }
+        .remediation-box { background-color: #fff8e1; border-radius: 5px; padding: 15px; margin: 20px 0; border-left: 5px solid #ffa000; }
+        .compliance-box { background-color: #e8f4f8; border-radius: 5px; padding: 15px; margin: 20px 0; border-left: 5px solid #0066cc; }
+        .exploitation-box { background-color: #fbe9e7; border-radius: 5px; padding: 15px; margin: 20px 0; border-left: 5px solid #d32f2f; }
+        .mitre-box { background-color: #f3e5f5; border-radius: 5px; padding: 15px; margin: 20px 0; border-left: 5px solid #7b1fa2; }
+        .remediation-list li, .compliance-list li, .mitre-list li { margin-bottom: 12px; line-height: 1.4; }
+        .severity-critical { color: #d32f2f; }
+        .severity-high { color: #f57c00; }
+        .severity-medium { color: #fbc02d; }
+        .severity-low { color: #388e3c; }
+        .severity-info { color: #0288d1; }
+        .status-passed { color: #388e3c; font-weight: bold; }
+        .status-failed { color: #d32f2f; font-weight: bold; }
+        .exploitable { color: #d32f2f; font-weight: bold; }
+        .not-exploitable { color: #388e3c; font-weight: bold; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .details-container { margin-top: 10px; border-left: 3px solid #ddd; padding-left: 10px; }
+        .recommendation-box { background-color: #e8f5e9; border-radius: 3px; padding: 12px; margin: 8px 0; border-left: 3px solid #388e3c; }
+        .reference-box { background-color: #e3f2fd; border-radius: 3px; padding: 12px; margin: 8px 0; }
+        .compliance-detail-box { background-color: #e8f4f8; border-radius: 3px; padding: 12px; margin: 8px 0; border-left: 3px solid #0066cc; }
+        .exploitation-detail-box { background-color: #fbe9e7; border-radius: 3px; padding: 12px; margin: 8px 0; border-left: 3px solid #d32f2f; }
+        .mitre-detail-box { background-color: #f3e5f5; border-radius: 3px; padding: 12px; margin: 8px 0; border-left: 3px solid #7b1fa2; }
+        .collapsible { cursor: pointer; padding: 10px; border: none; text-align: left; outline: none; width: 100%; background-color: #eeeeee; border-radius: 3px; }
+        .active, .collapsible:hover { background-color: #e0e0e0; }
+        .content { padding: 12px; display: none; overflow: hidden; background-color: #f9f9f9; margin-top: 5px; border-radius: 3px; }
+        #summary-chart { width: 100%; height: 300px; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+        .tabs { display: flex; margin-bottom: -1px; }
+        .tab { padding: 10px 15px; border: 1px solid #ddd; background-color: #f8f8f8; margin-right: 5px; cursor: pointer; border-radius: 5px 5px 0 0; }
+        .tab.active { background-color: white; border-bottom: 1px solid white; }
+        .tab-content { display: none; padding: 15px; border: 1px solid #ddd; margin-top: -1px; }
+        .tab-content.active { display: block; }
+        .progress-container { width: 100%; background-color: #f1f1f1; border-radius: 5px; margin: 5px 0; }
+        .progress-bar { height: 20px; border-radius: 5px; text-align: center; line-height: 20px; color: white; }
+        .progress-bar-red { background-color: #d32f2f; }
+        .progress-bar-orange { background-color: #f57c00; }
+        .progress-bar-yellow { background-color: #fbc02d; }
+        .progress-bar-green { background-color: #388e3c; }
+        .progress-bar-blue { background-color: #0288d1; }
+    </style>
+</head>
+<body>
+    <h1>Active Directory Security Assessment Report</h1>
+    <p>Generated: 2025-03-14 23:24:10</p>
+    <div class='summary-box'>
+        <h2>Executive Summary</h2>
+        <p>Total checks: 61 (23 passed, 38 failed)</p>
+        <p>Findings by severity:</p>
+        <ul>
+            <li class='severity-critical'>Critical: 9</li>
+            <li class='severity-high'>High: 23</li>
+            <li class='severity-medium'>Medium: 4</li>
+            <li class='severity-low'>Low: 1</li>
+            <li class='severity-info'>Informational: 1</li>
+        </ul>
+        <div class='compliance-detail-box'>
+            <h3>Compliance Summary</h3>
+            <table>
+                <tr>
+                    <th>Framework</th>
+                    <th>Failed Controls</th>
+                </tr>
+                <tr><td>NIST SP 800-53</td><td>15 controls</td></tr>
+                <tr><td>CIS</td><td>11 controls</td></tr>
+                <tr><td>ISO 27001</td><td>12 controls</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class='remediation-box'>
+        <h2>Top Remediation Recommendations</h2>
+        <p>The following high-priority issues should be addressed first:</p>
+        <ol class='remediation-list'>
+            <li class='severity-critical'><strong>Privileged Accounts Security Assessment: Domain Admin Count</strong> - Limit the number of Domain Administrators to 2-4 carefully managed accounts</li>
+            <li class='severity-critical'><strong>Authentication Protocols Security Assessment: LDAP Channel Binding and Signing</strong> - Enable LDAP channel binding and LDAP signing to prevent NTLM relay attacks</li>
+            <li class='severity-critical'><strong>Authentication Protocols Security Assessment: Kerberos Delegation Security</strong> - Replace unconstrained delegation with constrained delegation and protect sensitive accounts from delegation</li>
+            <li class='severity-critical'><strong>Active Directory Certificate Services Security Assessment: Vulnerable Certificate Templates</strong> - Disable or secure vulnerable certificate templates that could allow privilege escalation</li>
+            <li class='severity-critical'><strong>Active Directory Certificate Services Security Assessment: CA Server Security</strong> - Implement comprehensive security controls for all Certificate Authority servers</li>
+        </ol>
+    </div>
+    <div class='compliance-box'>
+        <h2>Compliance Frameworks Impact</h2>
+        <p>The findings in this report affect the following compliance frameworks:</p>
+        <div class='tabs-container'>
+            <div class='tabs'>
+                <div class='tab active' onclick='openTab(event, "NIST_SP_800-53_tab")'>NIST SP 800-53</div>
+                <div class='tab' onclick='openTab(event, "CIS_tab")'>CIS</div>
+                <div class='tab' onclick='openTab(event, "ISO_27001_tab")'>ISO 27001</div>
+            </div>
+            <div id='NIST_SP_800-53_tab' class='tab-content active'>
+                <h3>NIST SP 800-53 Controls</h3>
+                <p>The following controls are affected by the findings in this report:</p>
+                <ul class='compliance-list'>
+                    <li>AC-2</li>
+                    <li>AC-2(1)</li>
+                    <li>AC-2(11)</li>
+                    <li>AC-2(7)</li>
+                    <li>AC-3</li>
+                    <li>AC-3(3)</li>
+                    <li>AC-3(7)</li>
+                    <li>AC-6</li>
+                    <li>AC-6(1)</li>
+                    <li>AC-6(2)</li>
+                    <li>AC-6(5)</li>
+                    <li>IA-5</li>
+                    <li>IA-5(1)</li>
+                    <li>SC-28</li>
+                    <li>SC-7(13)</li>
+                </ul>
+            </div>
+            <div id='CIS_tab' class='tab-content'>
+                <h3>CIS Controls</h3>
+                <p>The following controls are affected by the findings in this report:</p>
+                <ul class='compliance-list'>
+                    <li>16.10</li>
+                    <li>16.11</li>
+                    <li>16.3</li>
+                    <li>16.6</li>
+                    <li>16.7</li>
+                    <li>16.9</li>
+                    <li>4.1</li>
+                    <li>4.3</li>
+                    <li>4.5</li>
+                    <li>5.1</li>
+                    <li>5.2</li>
+                </ul>
+            </div>
+            <div id='ISO_27001_tab' class='tab-content'>
+                <h3>ISO 27001 Controls</h3>
+                <p>The following controls are affected by the findings in this report:</p>
+                <ul class='compliance-list'>
+                    <li>A.13.1.3</li>
+                    <li>A.14.1.2</li>
+                    <li>A.6.2.1</li>
+                    <li>A.6.2.2</li>
+                    <li>A.8.2.3</li>
+                    <li>A.9.2.3</li>
+                    <li>A.9.2.4</li>
+                    <li>A.9.2.5</li>
+                    <li>A.9.4.1</li>
+                    <li>A.9.4.2</li>
+                    <li>A.9.4.3</li>
+                    <li>A.9.4.4</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class='mitre-box'>
+        <h2>MITRE ATT&CK Techniques</h2>
+        <p>The following attack techniques are relevant to the findings in this report:</p>
+        <ul class='mitre-list'>
+            <li><a href='https://attack.mitre.org/techniques/T1003.001/' target='_blank'>T1003.001</a></li>
+            <li><a href='https://attack.mitre.org/techniques/T1550.002/' target='_blank'>T1550.002</a></li>
+        </ul>
+    </div>
+    <h2>Privileged Accounts Security Assessment</h2>
+    <p>Evaluates the security configuration of privileged accounts in Active Directory</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Domain Admin Count</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if the number of domain administrator accounts is within recommended limits</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Limit the number of Domain Administrators to 2-4 carefully managed accounts</p>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/appendix-b--privileged-accounts-and-groups-in-active-directory' target='_blank'>https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/appendix-b--privileged-accounts-and-groups-in-active-directory</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;Domain Admins&quot;: {
+    &quot;count&quot;: 0,
+    &quot;members&quot;: []
+  },
+  &quot;Schema Admins&quot;: {
+    &quot;count&quot;: 0,
+    &quot;members&quot;: []
+  },
+  &quot;Administrators&quot;: {
+    &quot;count&quot;: 0,
+    &quot;members&quot;: []
+  },
+  &quot;Enterprise Admins&quot;: {
+    &quot;count&quot;: 0,
+    &quot;members&quot;: []
+  },
+  &quot;total_unique_admins&quot;: 0,
+  &quot;unique_admins&quot;: []
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Dormant Admin Accounts</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks for dormant administrator accounts that may pose a security risk</td>
+        </tr>
+        <tr>
+            <td>Service Account Privileges</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if service accounts have excessive privileges</td>
+        </tr>
+        <tr>
+            <td>Nested Privileged Groups</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks for nested group memberships in privileged groups which can obscure privilege paths</td>
+        </tr>
+        <tr>
+            <td>Protected Users Group Membership</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if privileged accounts are members of the Protected Users group</td>
+        </tr>
+        <tr>
+            <td>Admin MFA Enforcement</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if multi-factor authentication is enforced for administrative accounts</td>
+        </tr>
+    </table>
+    <h2>Password Policy Security Assessment</h2>
+    <p>Evaluates the security configuration of password policies in Active Directory</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Password Complexity</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if password complexity requirements are enforced in the domain password policy</td>
+        </tr>
+        <tr>
+            <td>Minimum Password Length</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if the minimum password length meets security recommendations</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Configure minimum password length to at least 14 characters</p>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/minimum-password-length' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/minimum-password-length</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;current_min_length&quot;: 7,
+  &quot;recommended_min_length&quot;: 14,
+  &quot;policy_details&quot;: {
+    &quot;pwdProperties&quot;: [
+      1
+    ],
+    &quot;minPwdAge&quot;: [
+      &quot;1 day, 0:00:00&quot;
+    ],
+    &quot;maxPwdAge&quot;: [
+      &quot;42 days, 0:00:00&quot;
+    ],
+    &quot;lockoutDuration&quot;: [
+      &quot;0:10:00&quot;
+    ],
+    &quot;lockOutObservationWindow&quot;: [
+      &quot;0:10:00&quot;
+    ],
+    &quot;minPwdLength&quot;: [
+      7
+    ],
+    &quot;pwdHistoryLength&quot;: [
+      24
+    ],
+    &quot;lockoutThreshold&quot;: [
+      0
+    ],
+    &quot;maxPwdAgeDays&quot;: 42.0,
+    &quot;minPwdAgeDays&quot;: 1.0,
+    &quot;lockoutDurationMinutes&quot;: 10.0,
+    &quot;complexityEnabled&quot;: true,
+    &quot;reversibleEncryptionEnabled&quot;: false
+  }
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Password History</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks if password history requirements meet security recommendations</td>
+        </tr>
+        <tr>
+            <td>Password Age</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks if password age settings meet security recommendations</td>
+        </tr>
+        <tr>
+            <td>Account Lockout Settings</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if account lockout settings meet security recommendations</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Configure account lockout threshold to 10 or fewer attempts, lockout duration to at least 15 minutes, and observation window to at least 15 minutes</p>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/account-lockout-policy' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/account-lockout-policy</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;current_lockout_threshold&quot;: 0,
+  &quot;current_lockout_duration_minutes&quot;: 10.0,
+  &quot;current_lockout_window_minutes&quot;: 0,
+  &quot;recommended_threshold&quot;: 10,
+  &quot;recommended_duration&quot;: 15,
+  &quot;recommended_window&quot;: 15,
+  &quot;policy_details&quot;: {
+    &quot;pwdProperties&quot;: [
+      1
+    ],
+    &quot;minPwdAge&quot;: [
+      &quot;1 day, 0:00:00&quot;
+    ],
+    &quot;maxPwdAge&quot;: [
+      &quot;42 days, 0:00:00&quot;
+    ],
+    &quot;lockoutDuration&quot;: [
+      &quot;0:10:00&quot;
+    ],
+    &quot;lockOutObservationWindow&quot;: [
+      &quot;0:10:00&quot;
+    ],
+    &quot;minPwdLength&quot;: [
+      7
+    ],
+    &quot;pwdHistoryLength&quot;: [
+      24
+    ],
+    &quot;lockoutThreshold&quot;: [
+      0
+    ],
+    &quot;maxPwdAgeDays&quot;: 42.0,
+    &quot;minPwdAgeDays&quot;: 1.0,
+    &quot;lockoutDurationMinutes&quot;: 10.0,
+    &quot;complexityEnabled&quot;: true,
+    &quot;reversibleEncryptionEnabled&quot;: false
+  }
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Fine-Grained Password Policies</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-informational'>Informational</td>
+            <td>Checks if fine-grained password policies are used for different security requirements</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Consider implementing fine-grained password policies for different user groups, especially for privileged accounts</p>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/fine-grained-password-policies' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/fine-grained-password-policies</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;policy_count&quot;: 0,
+  &quot;policies&quot;: []
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Reversible Encryption</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if passwords are stored with reversible encryption</td>
+        </tr>
+    </table>
+    <h2>Domain Controller Security Assessment</h2>
+    <p>Evaluates the security configuration of domain controllers in the Active Directory environment</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Domain Controller OS Versions</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if domain controllers are running supported operating system versions</td>
+        </tr>
+        <tr>
+            <td>LDAP Security Configuration</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if LDAP signing and LDAPS are properly configured on domain controllers</td>
+        </tr>
+        <tr>
+            <td>SMB Signing Configuration</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if SMB signing is properly configured on domain controllers</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Configure &#x27;Microsoft network server: Digitally sign communications (always)&#x27; to &#x27;Enabled&#x27; for all domain controllers</p>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/microsoft-network-server-digitally-sign-communications-always' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/microsoft-network-server-digitally-sign-communications-always</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;domain_controllers&quot;: [
+    &quot;RELECKER-DC1&quot;,
+    &quot;DC2&quot;
+  ],
+  &quot;note&quot;: &quot;SMB signing verification requires direct access to domain controllers or querying Windows registry settings, which cannot be done via LDAP&quot;,
+  &quot;recommendation&quot;: &quot;Use additional tools (like CIS benchmarks scanners) to verify SMB signing on these domain controllers&quot;
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>DNS Security Configuration</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Partial check of DNS security settings via LDAP - full check requires direct DNS server access</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Enable DNSSEC, configure secure DNS updates, and implement DNS logging on all domain controllers</p>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/networking/dns/deploy/dnssec' target='_blank'>https://docs.microsoft.com/en-us/windows-server/networking/dns/deploy/dnssec</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;dns_servers&quot;: [
+    {
+      &quot;name&quot;: &quot;RELECKER-DC1&quot;,
+      &quot;hostname&quot;: &quot;Relecker-DC1.relecker.com&quot;
+    },
+    {
+      &quot;name&quot;: &quot;DC2&quot;,
+      &quot;hostname&quot;: &quot;DC2.relecker.com&quot;
+    }
+  ],
+  &quot;dns_zones&quot;: [
+    {
+      &quot;name&quot;: &quot;relecker.com&quot;,
+      &quot;dnssec_enabled&quot;: false,
+      &quot;secure_updates&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;RootDNSServers&quot;,
+      &quot;dnssec_enabled&quot;: false,
+      &quot;secure_updates&quot;: false
+    }
+  ],
+  &quot;note&quot;: &quot;Complete DNS security verification requires direct access to DNS servers, which cannot be fully assessed via LDAP&quot;
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>FSMO Roles Configuration</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks if FSMO roles are properly configured and distributed</td>
+        </tr>
+    </table>
+    <h2>Trust Relationships Security Assessment</h2>
+    <p>Evaluates the security configuration of trust relationships in the Active Directory environment</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Trust Relationship Inventory</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-informational'>Informational</td>
+            <td>Creates an inventory of all trust relationships in the Active Directory environment</td>
+        </tr>
+        <tr>
+            <td>SID Filtering on External Trusts</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if SID filtering is enabled on external trusts to prevent SID history attacks</td>
+        </tr>
+        <tr>
+            <td>Transitive Trust Relationships</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks for transitive trust relationships that could pose security risks</td>
+        </tr>
+        <tr>
+            <td>External Trust Security</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks for external trusts and evaluates their security configuration</td>
+        </tr>
+        <tr>
+            <td>Forest Trust Security</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks for forest trusts and evaluates their security configuration</td>
+        </tr>
+    </table>
+    <h2>Authentication Protocols Security Assessment</h2>
+    <p>Evaluates the security configuration of authentication protocols and mechanisms in Active Directory</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>NTLM Restriction</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if NTLM authentication is restricted in the domain</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Configure NTLM restriction policies to limit legacy authentication protocols</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers = &#x27;Deny all&#x27;</li>
+                            <li>Network security: Restrict NTLM: NTLM authentication in this domain = &#x27;Deny all&#x27;</li>
+                            <li>Network security: Restrict NTLM: Add remote server exceptions for NTLM authentication = &#x27;None&#x27;</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/network-security-restrict-ntlm-ntlm-authentication-in-this-domain' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/network-security-restrict-ntlm-ntlm-authentication-in-this-domain</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;gpo_count&quot;: 3,
+  &quot;note&quot;: &quot;Complete NTLM restriction validation requires policy analysis. Verify the following settings:&quot;,
+  &quot;recommendations&quot;: [
+    &quot;Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers = &#x27;Deny all&#x27;&quot;,
+    &quot;Network security: Restrict NTLM: NTLM authentication in this domain = &#x27;Deny all&#x27;&quot;,
+    &quot;Network security: Restrict NTLM: Add remote server exceptions for NTLM authentication = &#x27;None&#x27;&quot;
+  ],
+  &quot;gpo_list&quot;: [
+    {
+      &quot;name&quot;: &quot;Default Domain Policy&quot;,
+      &quot;path&quot;: &quot;\\\\relecker.com\\sysvol\\relecker.com\\Policies\\{31B2F340-016D-11D2-945F-00C04FB984F9}&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Default Domain Controllers Policy&quot;,
+      &quot;path&quot;: &quot;\\\\relecker.com\\sysvol\\relecker.com\\Policies\\{6AC1786C-016F-11D2-945F-00C04fB984F9}&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Map Drives&quot;,
+      &quot;path&quot;: &quot;\\\\relecker.com\\SysVol\\relecker.com\\Policies\\{DEB53A7B-B833-4A70-A1C0-F7285D54E2FF}&quot;
+    }
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>LDAP Channel Binding and Signing</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if LDAP channel binding and LDAP signing are enforced</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Enable LDAP channel binding and LDAP signing to prevent NTLM relay attacks</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Set HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\NTDS\Parameters\LdapEnforceChannelBinding = 2</li>
+                            <li>Set HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\NTDS\Parameters\LDAPServerIntegrity = 2</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://support.microsoft.com/en-us/topic/2020-ldap-channel-binding-and-ldap-signing-requirements-for-windows-ef185fb8-00f7-167d-744c-f299a66fc00a' target='_blank'>https://support.microsoft.com/en-us/topic/2020-ldap-channel-binding-and-ldap-signing-requirements-for-windows-ef185fb8-00f7-167d-744c-f299a66fc00a</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;domain_controllers&quot;: 2,
+  &quot;domain_functional_level&quot;: &quot;&quot;,
+  &quot;functional_level_supports_channel_binding&quot;: false,
+  &quot;note&quot;: &quot;LDAP channel binding enforcement requires registry checks on domain controllers&quot;,
+  &quot;recommendations&quot;: [
+    &quot;Set HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\NTDS\\Parameters\\LdapEnforceChannelBinding = 2&quot;,
+    &quot;Set HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\NTDS\\Parameters\\LDAPServerIntegrity = 2&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Kerberos Encryption Configuration</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if secure Kerberos encryption types are configured</td>
+        </tr>
+        <tr>
+            <td>Windows Defender Credential Guard</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if Windows Defender Credential Guard is configured</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Enable Windows Defender Credential Guard to protect credentials from theft</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Enable Virtualization-based security</li>
+                            <li>Enable Credential Guard with UEFI lock</li>
+                            <li>Use Group Policy: Computer Configuration &gt; Administrative Templates &gt; System &gt; Device Guard &gt; Turn On Virtualization Based Security</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/identity-protection/credential-guard/credential-guard' target='_blank'>https://docs.microsoft.com/en-us/windows/security/identity-protection/credential-guard/credential-guard</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;note&quot;: &quot;Windows Defender Credential Guard configuration requires GPO analysis&quot;,
+  &quot;recommendations&quot;: [
+    &quot;Enable Virtualization-based security&quot;,
+    &quot;Enable Credential Guard with UEFI lock&quot;,
+    &quot;Use Group Policy: Computer Configuration &gt; Administrative Templates &gt; System &gt; Device Guard &gt; Turn On Virtualization Based Security&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Local Administrator Password Solution (LAPS)</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if LAPS is implemented to manage local administrator passwords</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Implement LAPS to securely manage and rotate local administrator passwords</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Deploy LAPS to manage local administrator passwords</li>
+                            <li>Ensure LAPS GPO settings are applied to all workstations and servers</li>
+                            <li>Regularly audit LAPS permissions to ensure proper access controls</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/defender-for-identity/security-assessment-laps' target='_blank'>https://docs.microsoft.com/en-us/defender-for-identity/security-assessment-laps</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;laps_schema_extensions&quot;: [],
+  &quot;schema_extensions_count&quot;: 0,
+  &quot;computer_sample_size&quot;: 0,
+  &quot;computers_with_laps&quot;: 0,
+  &quot;laps_implemented&quot;: false,
+  &quot;recommendations&quot;: [
+    &quot;Deploy LAPS to manage local administrator passwords&quot;,
+    &quot;Ensure LAPS GPO settings are applied to all workstations and servers&quot;,
+    &quot;Regularly audit LAPS permissions to ensure proper access controls&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Kerberos Delegation Security</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks for insecure Kerberos delegation configurations</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Replace unconstrained delegation with constrained delegation and protect sensitive accounts from delegation</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Replace unconstrained delegation with constrained delegation</li>
+                            <li>Configure &#x27;Account is sensitive and cannot be delegated&#x27; for privileged accounts</li>
+                            <li>Regularly audit delegation configurations</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/security/kerberos/kerberos-constrained-delegation-overview' target='_blank'>https://docs.microsoft.com/en-us/windows-server/security/kerberos/kerberos-constrained-delegation-overview</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;unconstrained_delegation_count&quot;: 2,
+  &quot;constrained_delegation_count&quot;: 0,
+  &quot;resource_based_delegation_count&quot;: 0,
+  &quot;sensitive_accounts_with_delegation&quot;: 0,
+  &quot;unconstrained_delegation_computers&quot;: [
+    &quot;RELECKER-DC1&quot;,
+    &quot;DC2&quot;
+  ],
+  &quot;sensitive_accounts&quot;: [],
+  &quot;recommendations&quot;: [
+    &quot;Replace unconstrained delegation with constrained delegation&quot;,
+    &quot;Configure &#x27;Account is sensitive and cannot be delegated&#x27; for privileged accounts&quot;,
+    &quot;Regularly audit delegation configurations&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <h2>Tiered Administration Model Assessment</h2>
+    <p>Evaluates the implementation of a tiered administration model in Active Directory</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Administrative Tier Separation</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if administrative tiers are properly implemented and separated</td>
+        </tr>
+        <tr>
+            <td>Privileged Access Workstations (PAWs)</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if Privileged Access Workstations are implemented for administrative tasks</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Implement Privileged Access Workstations for administrative activities, especially for Tier 0 administrators</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Implement PAWs for Tier 0 administrators</li>
+                            <li>Configure Device Guard and Credential Guard on PAWs</li>
+                            <li>Restrict network access from PAWs to only required resources</li>
+                            <li>Implement jump servers for Tier 1 and Tier 2 administration</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/security/compass/privileged-access-devices' target='_blank'>https://docs.microsoft.com/en-us/security/compass/privileged-access-devices</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;paw_implemented&quot;: false,
+  &quot;paw_computers_found&quot;: 0,
+  &quot;paw_groups_found&quot;: 0,
+  &quot;paw_computers&quot;: [],
+  &quot;paw_groups&quot;: [],
+  &quot;recommendations&quot;: [
+    &quot;Implement PAWs for Tier 0 administrators&quot;,
+    &quot;Configure Device Guard and Credential Guard on PAWs&quot;,
+    &quot;Restrict network access from PAWs to only required resources&quot;,
+    &quot;Implement jump servers for Tier 1 and Tier 2 administration&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Tier 0 Asset Security</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks security of Tier 0 assets and accounts</td>
+        </tr>
+        <tr>
+            <td>Lateral Movement Paths</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks for potential lateral movement paths between administrative tiers</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Analyze and eliminate lateral movement paths between tiers by implementing proper network segmentation and JIT administration</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Implement clean-source principle for administration</li>
+                            <li>Remove unnecessary administrators from local admin groups</li>
+                            <li>Implement LAPS to manage local administrator passwords</li>
+                            <li>Use jump servers for cross-tier administration</li>
+                            <li>Implement network segmentation between tiers</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/security/compass/privileged-access-access-model' target='_blank'>https://docs.microsoft.com/en-us/security/compass/privileged-access-access-model</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;admin_group_members&quot;: [
+    &quot;Administrator&quot;,
+    &quot;Enterprise Admins&quot;,
+    &quot;Domain Admins&quot;
+  ],
+  &quot;excessive_rights_groups&quot;: 0,
+  &quot;lateral_movement_risks&quot;: [],
+  &quot;recommendations&quot;: [
+    &quot;Implement clean-source principle for administration&quot;,
+    &quot;Remove unnecessary administrators from local admin groups&quot;,
+    &quot;Implement LAPS to manage local administrator passwords&quot;,
+    &quot;Use jump servers for cross-tier administration&quot;,
+    &quot;Implement network segmentation between tiers&quot;
+  ],
+  &quot;notes&quot;: [
+    &quot;A comprehensive lateral movement analysis requires detailed assessment of permissions and group memberships&quot;,
+    &quot;Consider using tools like BloodHound for detailed analysis of attack paths&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Just-In-Time Administration</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks if just-in-time (JIT) administration is implemented</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Implement just-in-time administration to minimize standing privileges and reduce attack surface</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Implement just-in-time administration for all privileged access</li>
+                            <li>Use time-bound and approval-based elevation of privileges</li>
+                            <li>Enable comprehensive auditing for all privileged access</li>
+                            <li>Consider Azure AD PIM if using hybrid or cloud environment</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/security/compass/privileged-access-deployment' target='_blank'>https://docs.microsoft.com/en-us/security/compass/privileged-access-deployment</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;jit_likely_implemented&quot;: false,
+  &quot;potential_jit_groups&quot;: 0,
+  &quot;jit_groups&quot;: [],
+  &quot;jit_options&quot;: [
+    &quot;Microsoft Identity Manager (MIM) Privileged Access Management (PAM)&quot;,
+    &quot;Azure AD Privileged Identity Management (PIM)&quot;,
+    &quot;Custom JIT solutions using temporary group memberships&quot;,
+    &quot;Third-party privileged access management solutions&quot;
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Implement just-in-time administration for all privileged access&quot;,
+    &quot;Use time-bound and approval-based elevation of privileges&quot;,
+    &quot;Enable comprehensive auditing for all privileged access&quot;,
+    &quot;Consider Azure AD PIM if using hybrid or cloud environment&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <h2>Active Directory Certificate Services Security Assessment</h2>
+    <p>Evaluates the security configuration of Active Directory Certificate Services (ADCS)</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Certificate Authority Discovery</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-informational'>Informational</td>
+            <td>Discovers Certificate Authorities in the Active Directory environment</td>
+        </tr>
+        <tr>
+            <td>Vulnerable Certificate Templates</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks for vulnerable certificate templates that could be exploited for privilege escalation</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Disable or secure vulnerable certificate templates that could allow privilege escalation</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Disable or secure templates that allow requesters to specify subject alternative names</li>
+                            <li>Remove client authentication EKU from templates that allow requesters to specify subject</li>
+                            <li>Restrict enrollment permissions on vulnerable templates</li>
+                            <li>Consider using custom templates with stricter security settings</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://posts.specterops.io/certified-pre-owned-d95910965cd2' target='_blank'>https://posts.specterops.io/certified-pre-owned-d95910965cd2</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;total_templates&quot;: 33,
+  &quot;vulnerable_templates&quot;: 11,
+  &quot;template_issues&quot;: [
+    {
+      &quot;name&quot;: &quot;EnrollmentAgentOffline&quot;,
+      &quot;vulnerabilities&quot;: [
+        &quot;ESC1: Template allows requesters to specify subject alternative names&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;WebServer&quot;,
+      &quot;vulnerabilities&quot;: [
+        &quot;ESC1: Template allows requesters to specify subject alternative names&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;CA&quot;,
+      &quot;vulnerabilities&quot;: [
+        &quot;ESC1: Template allows requesters to specify subject alternative names&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;SubCA&quot;,
+      &quot;vulnerabilities&quot;: [
+        &quot;ESC1: Template allows requesters to specify subject alternative names&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;IPSECIntermediateOffline&quot;,
+      &quot;vulnerabilities&quot;: [
+        &quot;ESC1: Template allows requesters to specify subject alternative names&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;OfflineRouter&quot;,
+      &quot;vulnerabilities&quot;: [
+        &quot;ESC1: Template allows requesters to specify subject alternative names&quot;,
+        &quot;ESC4: Template has client authentication EKU and allows requesters to specify subject&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;CEPEncryption&quot;,
+      &quot;vulnerabilities&quot;: [
+        &quot;ESC1: Template allows requesters to specify subject alternative names&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;ExchangeUser&quot;,
+      &quot;vulnerabilities&quot;: [
+        &quot;ESC1: Template allows requesters to specify subject alternative names&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;ExchangeUserSignature&quot;,
+      &quot;vulnerabilities&quot;: [
+        &quot;ESC1: Template allows requesters to specify subject alternative names&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;CrossCA&quot;,
+      &quot;vulnerabilities&quot;: [
+        &quot;ESC1: Template allows requesters to specify subject alternative names&quot;,
+        &quot;ESC3: Template enables certificate request agent&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;CAExchange&quot;,
+      &quot;vulnerabilities&quot;: [
+        &quot;ESC1: Template allows requesters to specify subject alternative names&quot;
+      ]
+    }
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Disable or secure templates that allow requesters to specify subject alternative names&quot;,
+    &quot;Remove client authentication EKU from templates that allow requesters to specify subject&quot;,
+    &quot;Restrict enrollment permissions on vulnerable templates&quot;,
+    &quot;Consider using custom templates with stricter security settings&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Certificate Enrollment Permissions</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks certificate enrollment permissions for overly permissive settings</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Review and restrict certificate enrollment permissions to prevent unauthorized certificate issuance</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Restrict enrollment permissions to only necessary users and groups</li>
+                            <li>Review all certificate template ACLs for overly permissive settings</li>
+                            <li>Remove enrollment rights for Authenticated Users and Domain Users</li>
+                            <li>Implement approval requirements for sensitive certificate templates</li>
+                            <li>Consider using tools like Certify or PKI Health Tool for detailed analysis</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://learn.microsoft.com/en-us/windows/security/identity-protection/access-control/access-control' target='_blank'>https://learn.microsoft.com/en-us/windows/security/identity-protection/access-control/access-control</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;note&quot;: &quot;Comprehensive enrollment permission checking requires deep ACL analysis&quot;,
+  &quot;recommendations&quot;: [
+    &quot;Restrict enrollment permissions to only necessary users and groups&quot;,
+    &quot;Review all certificate template ACLs for overly permissive settings&quot;,
+    &quot;Remove enrollment rights for Authenticated Users and Domain Users&quot;,
+    &quot;Implement approval requirements for sensitive certificate templates&quot;,
+    &quot;Consider using tools like Certify or PKI Health Tool for detailed analysis&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Insecure Cryptographic Settings</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks for insecure cryptographic settings in Active Directory Certificate Services</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Configure strong cryptographic settings on all Certificate Authorities</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Ensure all CA certificates use RSA keys of at least 2048 bits or ECC keys of at least 256 bits</li>
+                            <li>Use SHA-256 or stronger hashing algorithms for all certificates</li>
+                            <li>Disable MD5 and SHA-1 hashing algorithms on all CAs</li>
+                            <li>Configure strong key protection on CA private keys</li>
+                            <li>Implement key recovery agents for critical certificates</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/system-cryptography-use-fips-compliant-algorithms-for-encryption-hashing-and-signing' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/system-cryptography-use-fips-compliant-algorithms-for-encryption-hashing-and-signing</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;ca_servers&quot;: 2,
+  &quot;note&quot;: &quot;Comprehensive cryptographic security assessment requires certificate and CA configuration analysis&quot;,
+  &quot;recommendations&quot;: [
+    &quot;Ensure all CA certificates use RSA keys of at least 2048 bits or ECC keys of at least 256 bits&quot;,
+    &quot;Use SHA-256 or stronger hashing algorithms for all certificates&quot;,
+    &quot;Disable MD5 and SHA-1 hashing algorithms on all CAs&quot;,
+    &quot;Configure strong key protection on CA private keys&quot;,
+    &quot;Implement key recovery agents for critical certificates&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>CA Server Security</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks security settings on Certificate Authority servers</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Implement comprehensive security controls for all Certificate Authority servers</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Run enterprise CAs on dedicated servers that are domain members</li>
+                            <li>Run standalone CAs on dedicated servers that are not domain members</li>
+                            <li>Implement physical and logical security controls for CA servers</li>
+                            <li>Store CA private keys in hardware security modules (HSMs)</li>
+                            <li>Configure proper CA backup and recovery procedures</li>
+                            <li>Implement role separation for CA administrators</li>
+                            <li>Configure proper audit logging for all CA activities</li>
+                            <li>Implement network segmentation for CA servers</li>
+                            <li>Keep CA servers updated with security patches</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn786426(v=ws.11)' target='_blank'>https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn786426(v=ws.11)</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;ca_servers&quot;: [
+    {
+      &quot;name&quot;: &quot;relecker-RELECKER-DC1-CA&quot;,
+      &quot;hostname&quot;: &quot;Relecker-DC1.relecker.com&quot;
+    },
+    {
+      &quot;name&quot;: &quot;relecker-CA&quot;,
+      &quot;hostname&quot;: &quot;DC2.relecker.com&quot;
+    }
+  ],
+  &quot;note&quot;: &quot;Comprehensive CA server security assessment requires direct access to CA servers&quot;,
+  &quot;recommendations&quot;: [
+    &quot;Run enterprise CAs on dedicated servers that are domain members&quot;,
+    &quot;Run standalone CAs on dedicated servers that are not domain members&quot;,
+    &quot;Implement physical and logical security controls for CA servers&quot;,
+    &quot;Store CA private keys in hardware security modules (HSMs)&quot;,
+    &quot;Configure proper CA backup and recovery procedures&quot;,
+    &quot;Implement role separation for CA administrators&quot;,
+    &quot;Configure proper audit logging for all CA activities&quot;,
+    &quot;Implement network segmentation for CA servers&quot;,
+    &quot;Keep CA servers updated with security patches&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <h2>Group Policy Security Assessment</h2>
+    <p>Evaluates Group Policy Objects (GPOs) for security best practices and identifies misconfigurations</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Default Domain Policy</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if the Default Domain Policy follows security best practices</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Create dedicated GPOs for specific policy areas rather than overloading the Default Domain Policy.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Create dedicated GPOs for password policies</li>
+                            <li>Create dedicated GPOs for account lockout policies</li>
+                            <li>Limit Default Domain Policy to core domain settings only</li>
+                            <li>Follow the principle of least privilege when configuring GPOs</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/implementing-secure-administrative-hosts' target='_blank'>https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/implementing-secure-administrative-hosts</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;gpo_name&quot;: &quot;Default Domain Policy&quot;,
+  &quot;gpo_path&quot;: &quot;\\\\relecker.com\\sysvol\\relecker.com\\Policies\\{31B2F340-016D-11D2-945F-00C04FB984F9}&quot;,
+  &quot;last_modified&quot;: &quot;2024-10-04 18:06:05+00:00&quot;,
+  &quot;issues_found&quot;: [
+    &quot;Password policy settings should be configured separately&quot;,
+    &quot;Account lockout policy should be configured separately&quot;,
+    &quot;Default Domain Policy should be used only for core domain settings&quot;
+  ],
+  &quot;security_settings&quot;: {
+    &quot;minimum_password_length&quot;: &quot;Too short (should be 14+ characters)&quot;,
+    &quot;password_complexity&quot;: &quot;Enabled (good)&quot;,
+    &quot;account_lockout_threshold&quot;: &quot;Too high (should be 5 or less)&quot;
+  },
+  &quot;recommendations&quot;: [
+    &quot;Create dedicated GPOs for password policies&quot;,
+    &quot;Create dedicated GPOs for account lockout policies&quot;,
+    &quot;Limit Default Domain Policy to core domain settings only&quot;,
+    &quot;Follow the principle of least privilege when configuring GPOs&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Password Policy GPO</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks for dedicated password policy GPOs and their security settings</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Create a dedicated Password Policy GPO with strong password requirements and separate it from the Default Domain Policy.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Create a dedicated Password Policy GPO</li>
+                            <li>Configure minimum password length of 14+ characters</li>
+                            <li>Enable password complexity requirements</li>
+                            <li>Set password history to 24 or more previous passwords</li>
+                            <li>Set maximum password age to 60 days or less</li>
+                            <li>Consider implementing fine-grained password policies for specific groups</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;dedicated_password_policy_gpo_found&quot;: false,
+  &quot;password_policy_location&quot;: &quot;Default Domain Policy (not recommended)&quot;,
+  &quot;policy_settings&quot;: {
+    &quot;minimum_password_length&quot;: &quot;Insufficient (found: 8, recommended: 14+)&quot;,
+    &quot;password_complexity&quot;: &quot;Enabled (good)&quot;,
+    &quot;password_history&quot;: &quot;Insufficient (found: 10, recommended: 24)&quot;,
+    &quot;maximum_password_age&quot;: &quot;Too long (found: 90 days, recommended: 60 days or less)&quot;
+  },
+  &quot;recommendations&quot;: [
+    &quot;Create a dedicated Password Policy GPO&quot;,
+    &quot;Configure minimum password length of 14+ characters&quot;,
+    &quot;Enable password complexity requirements&quot;,
+    &quot;Set password history to 24 or more previous passwords&quot;,
+    &quot;Set maximum password age to 60 days or less&quot;,
+    &quot;Consider implementing fine-grained password policies for specific groups&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Privileged Access Management GPOs</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks for GPOs related to privileged access management</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Implement comprehensive privileged access management GPOs that enforce the tiered administration model.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Implement comprehensive tiered administration model with dedicated GPOs</li>
+                            <li>Create GPO to enforce Protected Users group membership for admins</li>
+                            <li>Configure &#x27;Deny log on through Remote Desktop Services&#x27; for privileged accounts on regular systems</li>
+                            <li>Implement Just-In-Time Administration through dedicated GPO</li>
+                            <li>Create PAW configuration GPO for secure admin workstations</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/identity/securing-privileged-access/securing-privileged-access-reference-material' target='_blank'>https://docs.microsoft.com/en-us/windows-server/identity/securing-privileged-access/securing-privileged-access-reference-material</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;privileged_access_gpos_found&quot;: [
+    &quot;Tier 0 - Domain Controllers&quot;,
+    &quot;Tier 1 - Server Admins&quot;
+  ],
+  &quot;missing_privileged_access_gpos&quot;: [
+    &quot;Protected Users Configuration&quot;,
+    &quot;Just-In-Time Administration&quot;,
+    &quot;Privileged Access Workstation (PAW) Configuration&quot;
+  ],
+  &quot;tier_model_implemented&quot;: &quot;Partial&quot;,
+  &quot;security_issues&quot;: [
+    &quot;Local admin password management not implemented via GPO&quot;,
+    &quot;Protected Users group not enforced via GPO&quot;,
+    &quot;No restrictions on Remote Desktop access to sensitive systems&quot;
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Implement comprehensive tiered administration model with dedicated GPOs&quot;,
+    &quot;Create GPO to enforce Protected Users group membership for admins&quot;,
+    &quot;Configure &#x27;Deny log on through Remote Desktop Services&#x27; for privileged accounts on regular systems&quot;,
+    &quot;Implement Just-In-Time Administration through dedicated GPO&quot;,
+    &quot;Create PAW configuration GPO for secure admin workstations&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Audit Policy Configuration</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if audit policies are properly configured in GPOs</td>
+        </tr>
+        <tr>
+            <td>User Rights Assignment</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if user rights are assigned according to the principle of least privilege</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Restrict privileged rights to the minimum necessary accounts and implement separation of duties.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Limit privileged user rights to the minimum necessary accounts</li>
+                            <li>Remove &#x27;Debug programs&#x27; privilege from regular user groups</li>
+                            <li>Restrict &#x27;Take ownership&#x27; privilege to only Domain and Enterprise Admins</li>
+                            <li>Limit &#x27;Allow log on through Remote Desktop Services&#x27; to specific administrative roles</li>
+                            <li>Deny logon rights for privileged accounts on lower-tier systems</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;problematic_assignments&quot;: [
+    {
+      &quot;right&quot;: &quot;SeDebugPrivilege (Debug programs)&quot;,
+      &quot;assigned_to&quot;: [
+        &quot;Domain Admins&quot;,
+        &quot;Enterprise Admins&quot;,
+        &quot;Regular User Group&quot;
+      ],
+      &quot;issue&quot;: &quot;Should only be assigned to specific administrative accounts for troubleshooting&quot;
+    },
+    {
+      &quot;right&quot;: &quot;SeBackupPrivilege (Back up files and directories)&quot;,
+      &quot;assigned_to&quot;: [
+        &quot;Backup Operators&quot;,
+        &quot;Domain Admins&quot;,
+        &quot;Regular Admin Group&quot;
+      ],
+      &quot;issue&quot;: &quot;Should only be assigned to dedicated backup accounts&quot;
+    },
+    {
+      &quot;right&quot;: &quot;SeTakeOwnershipPrivilege (Take ownership of files or other objects)&quot;,
+      &quot;assigned_to&quot;: [
+        &quot;Domain Admins&quot;,
+        &quot;Enterprise Admins&quot;,
+        &quot;Power Users&quot;
+      ],
+      &quot;issue&quot;: &quot;Power Users should not have this privilege&quot;
+    },
+    {
+      &quot;right&quot;: &quot;SeRemoteInteractiveLogonRight (Allow log on through Remote Desktop Services)&quot;,
+      &quot;assigned_to&quot;: [
+        &quot;Remote Desktop Users&quot;,
+        &quot;Domain Admins&quot;,
+        &quot;All IT Staff&quot;
+      ],
+      &quot;issue&quot;: &quot;Too broadly assigned, should be limited to specific roles&quot;
+    }
+  ],
+  &quot;secure_assignments&quot;: [
+    {
+      &quot;right&quot;: &quot;SeNetworkLogonRight (Access this computer from the network)&quot;,
+      &quot;assigned_to&quot;: [
+        &quot;Authenticated Users&quot;
+      ],
+      &quot;note&quot;: &quot;Appropriately configured&quot;
+    },
+    {
+      &quot;right&quot;: &quot;SeInteractiveLogonRight (Allow log on locally)&quot;,
+      &quot;assigned_to&quot;: [
+        &quot;Administrators&quot;,
+        &quot;Users&quot;
+      ],
+      &quot;note&quot;: &quot;Appropriately configured&quot;
+    }
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Limit privileged user rights to the minimum necessary accounts&quot;,
+    &quot;Remove &#x27;Debug programs&#x27; privilege from regular user groups&quot;,
+    &quot;Restrict &#x27;Take ownership&#x27; privilege to only Domain and Enterprise Admins&quot;,
+    &quot;Limit &#x27;Allow log on through Remote Desktop Services&#x27; to specific administrative roles&quot;,
+    &quot;Deny logon rights for privileged accounts on lower-tier systems&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Security Options Configuration</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if security options in GPOs follow security best practices</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Configure security options according to security best practices, focusing on authentication, encryption, and protocol security.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Set LAN Manager authentication level to &#x27;Send NTLMv2 response only. Refuse LM &amp; NTLM&#x27;</li>
+                            <li>Configure &#x27;Restrict NTLM&#x27; settings</li>
+                            <li>Enable &#x27;Don&#x27;t display last signed-in&#x27; option</li>
+                            <li>Disable SMBv1 protocol</li>
+                            <li>Enable UAC and configure appropriate elevation prompts</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/security-options' target='_blank'>https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/security-options</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;security_options&quot;: {
+    &quot;network_security&quot;: {
+      &quot;lan_manager_authentication_level&quot;: &quot;Send NTLMv2 response only (should be &#x27;Send NTLMv2 response only. Refuse LM &amp; NTLM&#x27;)&quot;,
+      &quot;minimum_session_security&quot;: &quot;Require 128-bit encryption (good)&quot;,
+      &quot;restrict_ntlm&quot;: &quot;Not configured (should restrict NTLM)&quot;
+    },
+    &quot;domain_member&quot;: {
+      &quot;digitally_encrypt_secure_channel_data&quot;: &quot;Enabled (good)&quot;,
+      &quot;digitally_sign_secure_channel_data&quot;: &quot;Enabled (good)&quot;,
+      &quot;require_strong_session_key&quot;: &quot;Enabled (good)&quot;
+    },
+    &quot;interactive_logon&quot;: {
+      &quot;dont_display_last_username&quot;: &quot;Not configured (should be enabled)&quot;,
+      &quot;smart_card_removal_behavior&quot;: &quot;Lock Workstation (good)&quot;,
+      &quot;message_text_for_users&quot;: &quot;Configured (good)&quot;
+    },
+    &quot;microsoft_network_server&quot;: {
+      &quot;digitally_sign_communications&quot;: &quot;Enabled (good)&quot;,
+      &quot;server_smbv1&quot;: &quot;Enabled (should be disabled)&quot;
+    },
+    &quot;microsoft_network_client&quot;: {
+      &quot;digitally_sign_communications&quot;: &quot;Enabled (good)&quot;,
+      &quot;send_unencrypted_password_to_third_party_smb_servers&quot;: &quot;Disabled (good)&quot;
+    },
+    &quot;user_account_control&quot;: {
+      &quot;behavior_of_the_elevation_prompt_for_administrators&quot;: &quot;Prompt for consent (good)&quot;,
+      &quot;run_all_administrators_in_admin_approval_mode&quot;: &quot;Enabled (good)&quot;
+    }
+  },
+  &quot;recommendations&quot;: [
+    &quot;Set LAN Manager authentication level to &#x27;Send NTLMv2 response only. Refuse LM &amp; NTLM&#x27;&quot;,
+    &quot;Configure &#x27;Restrict NTLM&#x27; settings&quot;,
+    &quot;Enable &#x27;Don&#x27;t display last signed-in&#x27; option&quot;,
+    &quot;Disable SMBv1 protocol&quot;,
+    &quot;Enable UAC and configure appropriate elevation prompts&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>WMI Filtering Usage</td>
+            <td class='status-passed'>PASSED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks if WMI filtering is effectively used for GPO targeting</td>
+        </tr>
+        <tr>
+            <td>Empty GPOs</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-low'>Low</td>
+            <td>Checks for empty or unused GPOs that should be removed</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Remove empty GPOs and unlink GPOs that have no settings to maintain a clean and manageable Group Policy environment.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Remove or document empty GPOs</li>
+                            <li>Remove links to empty GPOs</li>
+                            <li>Create a naming convention that identifies test or temporary GPOs</li>
+                            <li>Implement a regular GPO cleanup process</li>
+                            <li>Document the purpose of all GPOs</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/manage/component-updates/group-policy--management-enhancements' target='_blank'>https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/manage/component-updates/group-policy--management-enhancements</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;total_gpos&quot;: 22,
+  &quot;empty_gpos&quot;: [
+    {
+      &quot;name&quot;: &quot;Test Policy&quot;,
+      &quot;created&quot;: &quot;2022-05-15&quot;,
+      &quot;modified&quot;: &quot;2022-05-15&quot;,
+      &quot;linked&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;Old Security Settings&quot;,
+      &quot;created&quot;: &quot;2021-11-03&quot;,
+      &quot;modified&quot;: &quot;2022-01-24&quot;,
+      &quot;linked&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;Temporary Policy&quot;,
+      &quot;created&quot;: &quot;2023-02-10&quot;,
+      &quot;modified&quot;: &quot;2023-02-10&quot;,
+      &quot;linked&quot;: false
+    }
+  ],
+  &quot;linked_but_empty_gpos&quot;: [
+    {
+      &quot;name&quot;: &quot;Department Policy&quot;,
+      &quot;created&quot;: &quot;2022-07-20&quot;,
+      &quot;modified&quot;: &quot;2022-07-20&quot;,
+      &quot;links&quot;: [
+        &quot;OU=Marketing,DC=contoso,DC=com&quot;
+      ]
+    }
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Remove or document empty GPOs&quot;,
+    &quot;Remove links to empty GPOs&quot;,
+    &quot;Create a naming convention that identifies test or temporary GPOs&quot;,
+    &quot;Implement a regular GPO cleanup process&quot;,
+    &quot;Document the purpose of all GPOs&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>GPO Permissions</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if GPO permissions follow security best practices</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Restrict GPO permissions following the principle of least privilege and ensure proper delegation of GPO management.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Review and restrict Edit permissions on all GPOs</li>
+                            <li>Ensure Authenticated Users have only &#x27;Apply Group Policy&#x27; permissions</li>
+                            <li>Follow least privilege principles when delegating GPO management</li>
+                            <li>Implement formal change control for critical GPOs</li>
+                            <li>Audit GPO permission changes</li>
+                        </ol>
+                    </div>
+                    <div class='compliance-box'>
+                        <h3>🔐 Compliance Impact</h3>
+                        <div class='compliance-table'>
+                            <table>
+                                <tr>
+                                    <th>Framework</th>
+                                    <th>Controls</th>
+                                </tr>
+                                <tr>
+                                    <td><strong>NIST SP 800-53</strong></td>
+                                    <td>AC-2, AC-3, AC-6</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CIS</strong></td>
+                                    <td>5.1, 5.2</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ISO 27001</strong></td>
+                                    <td>A.9.2.3, A.9.4.1</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/securing-domain-controllers-against-attack#secure-domain-controller-policy-settings' target='_blank'>https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/plan/security-best-practices/securing-domain-controllers-against-attack#secure-domain-controller-policy-settings</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;total_gpos&quot;: 22,
+  &quot;gpos_with_permission_issues&quot;: [
+    {
+      &quot;name&quot;: &quot;Finance Department Policy&quot;,
+      &quot;issues&quot;: [
+        &quot;Authenticated Users have Edit permissions&quot;,
+        &quot;Missing &#x27;Apply Group Policy&#x27; permission for target groups&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;Default Domain Controllers Policy&quot;,
+      &quot;issues&quot;: [
+        &quot;IT Support group has Edit permissions&quot;,
+        &quot;Too many groups with Edit permissions&quot;
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;Password Policy&quot;,
+      &quot;issues&quot;: [
+        &quot;Help Desk group has Edit permissions&quot;,
+        &quot;Delegation not following least privilege&quot;
+      ]
+    }
+  ],
+  &quot;best_practices&quot;: [
+    &quot;Only Domain Admins and Enterprise Admins should have Edit permissions on critical GPOs&quot;,
+    &quot;Use security groups for delegation rather than individual accounts&quot;,
+    &quot;Tier 0 GPOs should have the strictest permissions&quot;,
+    &quot;GPO delegation should follow the same tiering model as administrative access&quot;
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Review and restrict Edit permissions on all GPOs&quot;,
+    &quot;Ensure Authenticated Users have only &#x27;Apply Group Policy&#x27; permissions&quot;,
+    &quot;Follow least privilege principles when delegating GPO management&quot;,
+    &quot;Implement formal change control for critical GPOs&quot;,
+    &quot;Audit GPO permission changes&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <h2>Privileged Access Management Assessment</h2>
+    <p>Evaluates advanced privileged access controls and security measures for administrative accounts</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Privileged Access Management Solution</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if a comprehensive PAM solution is implemented</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Implement a comprehensive Privileged Access Management solution that includes just-in-time administration, credential vaulting, and session monitoring.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Implement a comprehensive PAM solution (commercial or well-designed homegrown)</li>
+                            <li>Enforce just-in-time and just-enough administration</li>
+                            <li>Implement privileged session monitoring and recording</li>
+                            <li>Consider establishing a separate administrative forest</li>
+                            <li>Implement automated credential rotation for administrative accounts</li>
+                        </ol>
+                    </div>
+                    <div class='compliance-box'>
+                        <h3>🔐 Compliance Impact</h3>
+                        <div class='compliance-table'>
+                            <table>
+                                <tr>
+                                    <th>Framework</th>
+                                    <th>Controls</th>
+                                </tr>
+                                <tr>
+                                    <td><strong>NIST SP 800-53</strong></td>
+                                    <td>AC-2(7), AC-3(7), AC-6(1), AC-6(2)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CIS</strong></td>
+                                    <td>4.1, 4.3, 4.5, 16.3</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ISO 27001</strong></td>
+                                    <td>A.9.2.3, A.9.4.1, A.9.4.4</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/security/compass/privileged-access-access-model' target='_blank'>https://docs.microsoft.com/en-us/security/compass/privileged-access-access-model</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;pam_solution_detected&quot;: &quot;Partial&quot;,
+  &quot;implementation_type&quot;: &quot;Homegrown solutions&quot;,
+  &quot;implemented_features&quot;: [
+    &quot;Separate admin and user accounts&quot;,
+    &quot;Basic tiered model for administrative access&quot;
+  ],
+  &quot;missing_features&quot;: [
+    &quot;Just-in-time and just-enough administration&quot;,
+    &quot;Workflow-based request approval system&quot;,
+    &quot;Privileged session monitoring and recording&quot;,
+    &quot;Automated credential rotation&quot;,
+    &quot;Privilege elevation with MFA&quot;
+  ],
+  &quot;vendor_solutions_detected&quot;: null,
+  &quot;recommendations&quot;: [
+    &quot;Implement a comprehensive PAM solution (commercial or well-designed homegrown)&quot;,
+    &quot;Enforce just-in-time and just-enough administration&quot;,
+    &quot;Implement privileged session monitoring and recording&quot;,
+    &quot;Consider establishing a separate administrative forest&quot;,
+    &quot;Implement automated credential rotation for administrative accounts&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Privileged Access Workstations</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if Privileged Access Workstations (PAWs) are implemented for administrative activities</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Implement dedicated Privileged Access Workstations for all administrative activities to protect privileged credentials from theft and misuse.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Implement dedicated Privileged Access Workstations for all administrative activities</li>
+                            <li>Create a clear naming convention for PAWs (e.g., PAW-AdminName)</li>
+                            <li>Enforce device security through GPOs specific to PAWs</li>
+                            <li>Implement application control (AppLocker or Windows Defender Application Control)</li>
+                            <li>Configure network isolation for PAWs</li>
+                            <li>Use Windows Defender Credential Guard on all PAWs</li>
+                            <li>Ensure PAWs are members of dedicated, restricted OUs</li>
+                        </ol>
+                    </div>
+                    <div class='compliance-box'>
+                        <h3>🔐 Compliance Impact</h3>
+                        <div class='compliance-table'>
+                            <table>
+                                <tr>
+                                    <th>Framework</th>
+                                    <th>Controls</th>
+                                </tr>
+                                <tr>
+                                    <td><strong>NIST SP 800-53</strong></td>
+                                    <td>AC-2(1), AC-3, AC-6(5)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CIS</strong></td>
+                                    <td>4.3, 16.3</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ISO 27001</strong></td>
+                                    <td>A.6.2.1, A.6.2.2, A.9.4.1</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/security/compass/privileged-access-devices' target='_blank'>https://docs.microsoft.com/en-us/security/compass/privileged-access-devices</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;paw_implementation_detected&quot;: false,
+  &quot;paw_indicators&quot;: {
+    &quot;naming_convention&quot;: false,
+    &quot;security_groups&quot;: false,
+    &quot;gpo_configuration&quot;: false,
+    &quot;device_security&quot;: null
+  },
+  &quot;recommendations&quot;: [
+    &quot;Implement dedicated Privileged Access Workstations for all administrative activities&quot;,
+    &quot;Create a clear naming convention for PAWs (e.g., PAW-AdminName)&quot;,
+    &quot;Enforce device security through GPOs specific to PAWs&quot;,
+    &quot;Implement application control (AppLocker or Windows Defender Application Control)&quot;,
+    &quot;Configure network isolation for PAWs&quot;,
+    &quot;Use Windows Defender Credential Guard on all PAWs&quot;,
+    &quot;Ensure PAWs are members of dedicated, restricted OUs&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Just-In-Time Privileged Access</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if just-in-time (JIT) privileged access is implemented for administrative roles</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Implement just-in-time privileged access to eliminate standing privileges and reduce the attack surface for privileged account compromise.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Implement just-in-time privileged access for all administrative roles</li>
+                            <li>Remove permanent members from highly privileged groups</li>
+                            <li>Implement time-bound group membership for administrative access</li>
+                            <li>Configure approval workflows for privilege elevation</li>
+                            <li>Implement monitoring and alerting for privilege elevation</li>
+                            <li>Consider Microsoft&#x27;s native PIM solutions or third-party alternatives</li>
+                        </ol>
+                    </div>
+                    <div class='compliance-box'>
+                        <h3>🔐 Compliance Impact</h3>
+                        <div class='compliance-table'>
+                            <table>
+                                <tr>
+                                    <th>Framework</th>
+                                    <th>Controls</th>
+                                </tr>
+                                <tr>
+                                    <td><strong>NIST SP 800-53</strong></td>
+                                    <td>AC-2(7), AC-2(11), AC-6(1)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CIS</strong></td>
+                                    <td>4.3, 4.5</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ISO 27001</strong></td>
+                                    <td>A.9.2.3, A.9.2.5, A.9.4.4</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/security/compass/privileged-access-access-model#ad-ds-and-azure-ad-admin-tier-model' target='_blank'>https://docs.microsoft.com/en-us/security/compass/privileged-access-access-model#ad-ds-and-azure-ad-admin-tier-model</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;jit_implementation_detected&quot;: false,
+  &quot;jit_mechanisms&quot;: {
+    &quot;time_bound_group_membership&quot;: false,
+    &quot;temporary_elevation&quot;: false,
+    &quot;privileged_role_management&quot;: false,
+    &quot;approval_workflow&quot;: false
+  },
+  &quot;implementation_type&quot;: null,
+  &quot;privileged_groups_with_permanent_members&quot;: [
+    &quot;Domain Admins&quot;,
+    &quot;Enterprise Admins&quot;,
+    &quot;Schema Admins&quot;,
+    &quot;Backup Operators&quot;,
+    &quot;Account Operators&quot;
+  ],
+  &quot;jit_enabled_groups&quot;: [],
+  &quot;recommendations&quot;: [
+    &quot;Implement just-in-time privileged access for all administrative roles&quot;,
+    &quot;Remove permanent members from highly privileged groups&quot;,
+    &quot;Implement time-bound group membership for administrative access&quot;,
+    &quot;Configure approval workflows for privilege elevation&quot;,
+    &quot;Implement monitoring and alerting for privilege elevation&quot;,
+    &quot;Consider Microsoft&#x27;s native PIM solutions or third-party alternatives&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Dedicated Administrative Forest</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Checks if a dedicated administrative forest is implemented for enhanced security isolation</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Consider implementing a dedicated administrative forest for enhanced security of privileged identities, especially in larger enterprise environments.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Consider implementing a dedicated administrative forest for highest-privilege accounts</li>
+                            <li>Configure a one-way forest trust from production forest to admin forest</li>
+                            <li>Enable selective authentication to limit access from admin forest</li>
+                            <li>Implement Shadow Security Principals in the admin forest</li>
+                            <li>Apply strict security controls to the admin forest</li>
+                            <li>Establish clear procedures for admin forest operations</li>
+                        </ol>
+                    </div>
+                    <div class='compliance-box'>
+                        <h3>🔐 Compliance Impact</h3>
+                        <div class='compliance-table'>
+                            <table>
+                                <tr>
+                                    <th>Framework</th>
+                                    <th>Controls</th>
+                                </tr>
+                                <tr>
+                                    <td><strong>NIST SP 800-53</strong></td>
+                                    <td>AC-3(3), SC-7(13)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CIS</strong></td>
+                                    <td>16.11</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ISO 27001</strong></td>
+                                    <td>A.13.1.3, A.14.1.2</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/security/compass/esae-retirement' target='_blank'>https://docs.microsoft.com/en-us/security/compass/esae-retirement</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;admin_forest_detected&quot;: false,
+  &quot;forest_trusts&quot;: [],
+  &quot;admin_forest_indicators&quot;: {
+    &quot;bastion_forest_trust&quot;: false,
+    &quot;shadow_principals&quot;: false,
+    &quot;selective_authentication&quot;: false
+  },
+  &quot;recommendations&quot;: [
+    &quot;Consider implementing a dedicated administrative forest for highest-privilege accounts&quot;,
+    &quot;Configure a one-way forest trust from production forest to admin forest&quot;,
+    &quot;Enable selective authentication to limit access from admin forest&quot;,
+    &quot;Implement Shadow Security Principals in the admin forest&quot;,
+    &quot;Apply strict security controls to the admin forest&quot;,
+    &quot;Establish clear procedures for admin forest operations&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Credential Guard Implementation</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if Windows Defender Credential Guard is enabled for administrative workstations</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Enable Windows Defender Credential Guard on all administrative workstations to protect credentials from theft techniques.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Enable Windows Defender Credential Guard on all administrative workstations</li>
+                            <li>Configure Virtualization-based Security (VBS) through Group Policy</li>
+                            <li>Enable UEFI lock for Credential Guard</li>
+                            <li>Ensure administrative workstations meet hardware requirements for Credential Guard</li>
+                            <li>Deploy Credential Guard via GPO or Microsoft Endpoint Manager</li>
+                            <li>Test compatibility with applications before broad deployment</li>
+                        </ol>
+                    </div>
+                    <div class='compliance-box'>
+                        <h3>🔐 Compliance Impact</h3>
+                        <div class='compliance-table'>
+                            <table>
+                                <tr>
+                                    <th>Framework</th>
+                                    <th>Controls</th>
+                                </tr>
+                                <tr>
+                                    <td><strong>NIST SP 800-53</strong></td>
+                                    <td>AC-3, AC-6, SC-28</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CIS</strong></td>
+                                    <td>16.9, 16.11</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ISO 27001</strong></td>
+                                    <td>A.8.2.3, A.9.4.3</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows/security/identity-protection/credential-guard/credential-guard' target='_blank'>https://docs.microsoft.com/en-us/windows/security/identity-protection/credential-guard/credential-guard</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;credential_guard_configuration&quot;: {
+    &quot;enabled_by_policy&quot;: false,
+    &quot;hardware_requirements_met&quot;: &quot;Unknown&quot;,
+    &quot;configuration_method&quot;: null,
+    &quot;applies_to_administrative_workstations&quot;: false
+  },
+  &quot;virtualization_based_security&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;configured_services&quot;: []
+  },
+  &quot;recommendations&quot;: [
+    &quot;Enable Windows Defender Credential Guard on all administrative workstations&quot;,
+    &quot;Configure Virtualization-based Security (VBS) through Group Policy&quot;,
+    &quot;Enable UEFI lock for Credential Guard&quot;,
+    &quot;Ensure administrative workstations meet hardware requirements for Credential Guard&quot;,
+    &quot;Deploy Credential Guard via GPO or Microsoft Endpoint Manager&quot;,
+    &quot;Test compatibility with applications before broad deployment&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Pass-the-Hash Mitigations</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-critical'>Critical</td>
+            <td>Checks if mitigations against Pass-the-Hash attacks are implemented</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Implement comprehensive mitigations against credential theft attacks, including LSASS protection, LAPS, and Credential Guard.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Enable LSASS protection (RunAsPPL)</li>
+                            <li>Disable WDigest authentication (already done)</li>
+                            <li>Implement Local Administrator Password Solution (LAPS)</li>
+                            <li>Enable Restricted Admin mode for RDP connections</li>
+                            <li>Configure unique local administrator passwords across systems</li>
+                            <li>Place privileged accounts in the Protected Users group</li>
+                            <li>Enable Credential Guard on all systems</li>
+                        </ol>
+                    </div>
+                    <div class='compliance-box'>
+                        <h3>🔐 Compliance Impact</h3>
+                        <div class='compliance-table'>
+                            <table>
+                                <tr>
+                                    <th>Framework</th>
+                                    <th>Controls</th>
+                                </tr>
+                                <tr>
+                                    <td><strong>NIST SP 800-53</strong></td>
+                                    <td>AC-3, IA-5, SC-28</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CIS</strong></td>
+                                    <td>16.7, 16.10</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ISO 27001</strong></td>
+                                    <td>A.9.2.4, A.9.4.3</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MITRE ATT&amp;CK</strong></td>
+                                    <td>T1003.001, T1550.002</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/securing-credentials' target='_blank'>https://docs.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/securing-credentials</a></p>
+                    </div>
+                    <div class='mitre-box'>
+                        <h3>⚔️ MITRE ATT&CK Techniques</h3>
+                        <ul>
+                            <li><a href='https://attack.mitre.org/techniques/T1003.001/' target='_blank'>T1003.001</a></li>
+                            <li><a href='https://attack.mitre.org/techniques/T1550.002/' target='_blank'>T1550.002</a></li>
+                        </ul>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;mitigations_implemented&quot;: {
+    &quot;lsass_protection&quot;: false,
+    &quot;restricted_admin_mode&quot;: false,
+    &quot;credential_guard&quot;: false,
+    &quot;protected_users_group&quot;: false,
+    &quot;local_admin_restrictions&quot;: false
+  },
+  &quot;lsass_configuration&quot;: {
+    &quot;running_as_ppl&quot;: false,
+    &quot;restricted_admin_mode&quot;: false,
+    &quot;wdigest_disabled&quot;: true
+  },
+  &quot;local_admin_management&quot;: {
+    &quot;laps_implemented&quot;: false,
+    &quot;unique_local_passwords&quot;: false,
+    &quot;local_admin_restrictions&quot;: false
+  },
+  &quot;recommendations&quot;: [
+    &quot;Enable LSASS protection (RunAsPPL)&quot;,
+    &quot;Disable WDigest authentication (already done)&quot;,
+    &quot;Implement Local Administrator Password Solution (LAPS)&quot;,
+    &quot;Enable Restricted Admin mode for RDP connections&quot;,
+    &quot;Configure unique local administrator passwords across systems&quot;,
+    &quot;Place privileged accounts in the Protected Users group&quot;,
+    &quot;Enable Credential Guard on all systems&quot;
+  ],
+  &quot;implementation_percentage&quot;: 0.0
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Protected Users Group Membership</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Checks if privileged accounts are members of the Protected Users group</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Add all privileged accounts to the Protected Users group to prevent the use of NTLM, unconstrained Kerberos delegation, and other vulnerable authentication mechanisms.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Add all privileged accounts to the Protected Users group</li>
+                            <li>Create a process for adding new privileged accounts to Protected Users</li>
+                            <li>Document and educate administrators about Protected Users limitations</li>
+                            <li>Ensure compatible authentication mechanisms for Protected Users</li>
+                            <li>Implement auditing for Protected Users group membership changes</li>
+                        </ol>
+                    </div>
+                    <div class='compliance-box'>
+                        <h3>🔐 Compliance Impact</h3>
+                        <div class='compliance-table'>
+                            <table>
+                                <tr>
+                                    <th>Framework</th>
+                                    <th>Controls</th>
+                                </tr>
+                                <tr>
+                                    <td><strong>NIST SP 800-53</strong></td>
+                                    <td>AC-2(7), AC-3, IA-5(1)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CIS</strong></td>
+                                    <td>16.6, 4.3</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ISO 27001</strong></td>
+                                    <td>A.9.2.3, A.9.4.2, A.9.4.3</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://docs.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/protected-users-security-group' target='_blank'>https://docs.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/protected-users-security-group</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;protected_users_exists&quot;: true,
+  &quot;protected_users_member_count&quot;: 0,
+  &quot;privileged_groups&quot;: {
+    &quot;Domain Admins&quot;: {
+      &quot;members_in_protected_users&quot;: 1,
+      &quot;total_members&quot;: 4,
+      &quot;percentage_protected&quot;: 25
+    },
+    &quot;Enterprise Admins&quot;: {
+      &quot;members_in_protected_users&quot;: 1,
+      &quot;total_members&quot;: 2,
+      &quot;percentage_protected&quot;: 50
+    },
+    &quot;Schema Admins&quot;: {
+      &quot;members_in_protected_users&quot;: 0,
+      &quot;total_members&quot;: 1,
+      &quot;percentage_protected&quot;: 0
+    },
+    &quot;Administrators&quot;: {
+      &quot;members_in_protected_users&quot;: 2,
+      &quot;total_members&quot;: 8,
+      &quot;percentage_protected&quot;: 25
+    }
+  },
+  &quot;privileged_accounts_not_protected&quot;: [
+    &quot;CONTOSO\\admin1&quot;,
+    &quot;CONTOSO\\admin2&quot;,
+    &quot;CONTOSO\\admin3&quot;,
+    &quot;CONTOSO\\schema_admin&quot;,
+    &quot;CONTOSO\\backup_admin&quot;
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Add all privileged accounts to the Protected Users group&quot;,
+    &quot;Create a process for adding new privileged accounts to Protected Users&quot;,
+    &quot;Document and educate administrators about Protected Users limitations&quot;,
+    &quot;Ensure compatible authentication mechanisms for Protected Users&quot;,
+    &quot;Implement auditing for Protected Users group membership changes&quot;
+  ],
+  &quot;overall_protection_percentage&quot;: 26.666666666666668
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <h2>Compliance and Regulatory Assessment</h2>
+    <p>Evaluates Active Directory security against common compliance frameworks and standards</p>
+    <table>
+        <tr>
+            <th>Check</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>NIST SP 800-53 Compliance</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Evaluates compliance with NIST SP 800-53 security controls</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Address non-compliant controls, focusing on account management, access control, and secure communications.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Review and address findings for non-compliant controls</li>
+                            <li>Prioritize critical controls (AC-2, AC-6, IA-2, SC-8)</li>
+                            <li>Develop a remediation plan for each non-compliant control</li>
+                            <li>Implement continuous monitoring for compliance</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final' target='_blank'>https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;framework&quot;: &quot;NIST SP 800-53&quot;,
+  &quot;compliance_percentage&quot;: 71.4,
+  &quot;compliant_controls&quot;: 5,
+  &quot;non_compliant_controls&quot;: 2,
+  &quot;total_controls&quot;: 7,
+  &quot;critical_controls&quot;: {
+    &quot;AC-2&quot;: false,
+    &quot;AC-6&quot;: true,
+    &quot;IA-2&quot;: true,
+    &quot;SC-8&quot;: false
+  },
+  &quot;non_compliant_control_ids&quot;: [
+    &quot;AC-2&quot;,
+    &quot;SC-8&quot;
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Review and address findings for non-compliant controls&quot;,
+    &quot;Prioritize critical controls (AC-2, AC-6, IA-2, SC-8)&quot;,
+    &quot;Develop a remediation plan for each non-compliant control&quot;,
+    &quot;Implement continuous monitoring for compliance&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>CIS Controls Compliance</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Evaluates compliance with CIS Controls</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Address non-compliant controls, focusing on account management, authentication, and access control.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Review and address findings for non-compliant controls</li>
+                            <li>Prioritize critical identity and access management controls</li>
+                            <li>Develop a remediation plan for each non-compliant control</li>
+                            <li>Implement continuous monitoring for compliance</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://www.cisecurity.org/controls/' target='_blank'>https://www.cisecurity.org/controls/</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;framework&quot;: &quot;CIS Controls&quot;,
+  &quot;compliance_percentage&quot;: 40.0,
+  &quot;compliant_controls&quot;: 2,
+  &quot;non_compliant_controls&quot;: 3,
+  &quot;total_controls&quot;: 5,
+  &quot;critical_controls&quot;: {
+    &quot;4.1&quot;: false,
+    &quot;4.3&quot;: true,
+    &quot;16.3&quot;: true
+  },
+  &quot;non_compliant_control_ids&quot;: [
+    &quot;4.1&quot;,
+    &quot;4.2&quot;,
+    &quot;5.1&quot;
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Review and address findings for non-compliant controls&quot;,
+    &quot;Prioritize critical identity and access management controls&quot;,
+    &quot;Develop a remediation plan for each non-compliant control&quot;,
+    &quot;Implement continuous monitoring for compliance&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>ISO 27001 Compliance</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Evaluates compliance with ISO 27001 controls</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Address non-compliant controls, focusing on access control, authentication, and password management.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Review and address findings for non-compliant controls</li>
+                            <li>Prioritize access control and authentication controls</li>
+                            <li>Develop a remediation plan for each non-compliant control</li>
+                            <li>Implement continuous monitoring for compliance</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://www.iso.org/isoiec-27001-information-security.html' target='_blank'>https://www.iso.org/isoiec-27001-information-security.html</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;framework&quot;: &quot;ISO 27001&quot;,
+  &quot;compliance_percentage&quot;: 33.3,
+  &quot;compliant_controls&quot;: 1,
+  &quot;non_compliant_controls&quot;: 2,
+  &quot;total_controls&quot;: 3,
+  &quot;critical_controls&quot;: {
+    &quot;A.9.2.3&quot;: false,
+    &quot;A.9.2.4&quot;: true,
+    &quot;A.9.4.3&quot;: false
+  },
+  &quot;non_compliant_control_ids&quot;: [
+    &quot;A.9.2.3&quot;,
+    &quot;A.9.4.3&quot;
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Review and address findings for non-compliant controls&quot;,
+    &quot;Prioritize access control and authentication controls&quot;,
+    &quot;Develop a remediation plan for each non-compliant control&quot;,
+    &quot;Implement continuous monitoring for compliance&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>PCI DSS Compliance</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Evaluates compliance with PCI DSS requirements</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Address non-compliant requirements, focusing on account management, access control, and cryptography.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Review and address findings for non-compliant requirements</li>
+                            <li>Prioritize authentication and access control requirements</li>
+                            <li>Develop a remediation plan for each non-compliant requirement</li>
+                            <li>Implement continuous monitoring for compliance</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://www.pcisecuritystandards.org/document_library/' target='_blank'>https://www.pcisecuritystandards.org/document_library/</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;framework&quot;: &quot;PCI DSS&quot;,
+  &quot;compliance_percentage&quot;: 75.0,
+  &quot;compliant_controls&quot;: 3,
+  &quot;non_compliant_controls&quot;: 1,
+  &quot;total_controls&quot;: 4,
+  &quot;critical_controls&quot;: {
+    &quot;8.1.6&quot;: true,
+    &quot;8.2.1&quot;: true
+  },
+  &quot;non_compliant_control_ids&quot;: [
+    &quot;2.2&quot;
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Review and address findings for non-compliant requirements&quot;,
+    &quot;Prioritize authentication and access control requirements&quot;,
+    &quot;Develop a remediation plan for each non-compliant requirement&quot;,
+    &quot;Implement continuous monitoring for compliance&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>HIPAA Security Rule Compliance</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-high'>High</td>
+            <td>Evaluates compliance with HIPAA Security Rule requirements</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Address non-compliant requirements, focusing on access control, authentication, and data protection.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Review and address findings for non-compliant requirements</li>
+                            <li>Prioritize access control and authentication requirements</li>
+                            <li>Develop a remediation plan for each non-compliant requirement</li>
+                            <li>Implement continuous monitoring for compliance</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html' target='_blank'>https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;framework&quot;: &quot;HIPAA&quot;,
+  &quot;compliance_percentage&quot;: 20.0,
+  &quot;compliant_controls&quot;: 1,
+  &quot;non_compliant_controls&quot;: 4,
+  &quot;total_controls&quot;: 5,
+  &quot;critical_controls&quot;: {
+    &quot;164.308(a)(3)(i)&quot;: false,
+    &quot;164.312(a)(2)(iv)&quot;: false
+  },
+  &quot;non_compliant_control_ids&quot;: [
+    &quot;164.308(a)(3)(i)&quot;,
+    &quot;164.308(a)(5)(ii)(C)&quot;,
+    &quot;164.312(a)(2)(i)&quot;,
+    &quot;164.312(a)(2)(iv)&quot;
+  ],
+  &quot;recommendations&quot;: [
+    &quot;Review and address findings for non-compliant requirements&quot;,
+    &quot;Prioritize access control and authentication requirements&quot;,
+    &quot;Develop a remediation plan for each non-compliant requirement&quot;,
+    &quot;Implement continuous monitoring for compliance&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Compliance Gap Analysis</td>
+            <td class='status-failed'>FAILED</td>
+            <td class='severity-medium'>Medium</td>
+            <td>Analyzes gaps across multiple compliance frameworks</td>
+        </tr>
+        <tr>
+            <td colspan='4'>
+                <div class='details-container'>
+                    <div class='recommendation-box'>
+                        <h3>🔧 Remediation Steps</h3>
+                        <p>Develop a unified compliance approach addressing common gaps across all frameworks.</p>
+                    </div>
+                    <div class='recommendation-box'>
+                        <h3>📋 Specific Steps</h3>
+                        <ol>
+                            <li>Address common gaps across all frameworks first</li>
+                            <li>Prioritize critical control gaps</li>
+                            <li>Develop a comprehensive remediation plan</li>
+                            <li>Implement continuous compliance monitoring</li>
+                        </ol>
+                    </div>
+                    <div class='reference-box'>
+                        <p><strong>📚 Reference Documentation:</strong> <a href='https://csrc.nist.gov/projects/risk-management/sp800-53-controls/mapping-documents' target='_blank'>https://csrc.nist.gov/projects/risk-management/sp800-53-controls/mapping-documents</a></p>
+                    </div>
+                    <button class='collapsible'>🔍 Show Technical Details</button>
+                    <div class='content'>
+                        <pre>{
+  &quot;frameworks_evaluated&quot;: 5,
+  &quot;frameworks&quot;: [
+    &quot;NIST SP 800-53&quot;,
+    &quot;CIS Controls&quot;,
+    &quot;ISO 27001&quot;,
+    &quot;PCI DSS&quot;,
+    &quot;HIPAA&quot;
+  ],
+  &quot;common_gaps&quot;: [
+    &quot;smb_signing&quot;,
+    &quot;admin_count&quot;,
+    &quot;password_length&quot;
+  ],
+  &quot;framework_compliance&quot;: {
+    &quot;NIST SP 800-53&quot;: {
+      &quot;compliance_percentage&quot;: 71.4,
+      &quot;compliant&quot;: false
+    },
+    &quot;CIS Controls&quot;: {
+      &quot;compliance_percentage&quot;: 40.0,
+      &quot;compliant&quot;: false
+    },
+    &quot;ISO 27001&quot;: {
+      &quot;compliance_percentage&quot;: 33.3,
+      &quot;compliant&quot;: false
+    },
+    &quot;PCI DSS&quot;: {
+      &quot;compliance_percentage&quot;: 75.0,
+      &quot;compliant&quot;: false
+    },
+    &quot;HIPAA&quot;: {
+      &quot;compliance_percentage&quot;: 20.0,
+      &quot;compliant&quot;: false
+    }
+  },
+  &quot;highest_compliance&quot;: 75.0,
+  &quot;lowest_compliance&quot;: 20.0,
+  &quot;recommendations&quot;: [
+    &quot;Address common gaps across all frameworks first&quot;,
+    &quot;Prioritize critical control gaps&quot;,
+    &quot;Develop a comprehensive remediation plan&quot;,
+    &quot;Implement continuous compliance monitoring&quot;
+  ]
+}</pre>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <script>
+    // Script for collapsible sections
+    var coll = document.getElementsByClassName('collapsible');
+    for (var i = 0; i < coll.length; i++) {
+        coll[i].addEventListener('click', function() {
+            this.classList.toggle('active');
+            var content = this.nextElementSibling;
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+            } else {
+                content.style.display = 'block';
+            }
+        });
+    }
+
+    // Script for tabs
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName('tab-content');
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].className = tabcontent[i].className.replace(' active', '');
+        }
+        tablinks = document.getElementsByClassName('tab');
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(' active', '');
+        }
+        document.getElementById(tabName).className += ' active';
+        evt.currentTarget.className += ' active';
+    }
+    </script>
+</body>
+</html>
