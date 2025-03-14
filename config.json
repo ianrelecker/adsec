@@ -12,7 +12,7 @@
         "use_kerberos": false
     },
     "reporting": {
-        "output_dir": "./test_reports",
-        "formats": ["html", "json"]
+        "output_dir": "./reports",
+        "formats": ["html", "json", "csv"]
     }
 }

@@ -60,27 +60,60 @@ adseceval --config config.json --log-level DEBUG
 
 ## Assessment Modules
 
-ADSecEval includes several assessment modules, each focusing on a specific aspect of Active Directory security:
+ADSecEval includes comprehensive assessment modules, each focusing on a specific aspect of Active Directory security:
 
 1. **Privileged Accounts** - Evaluates security of administrator and other privileged accounts
 2. **Password Policy** - Assesses password policy settings and enforcement
 3. **Domain Controllers** - Checks security configurations on domain controllers
 4. **Trust Relationships** - Analyzes trust relationships for security issues
+5. **Exploitation** - Validates vulnerabilities through safe exploitation testing
+6. **Compliance** - Maps findings to regulatory frameworks and standards
+7. **Group Policy** - Assesses GPO security configurations and best practices
+8. **Privileged Access** - Evaluates advanced privileged access management controls
 
 ### Customizing Assessments
 
-You can enable/disable specific assessments in your configuration file:
+You can enable/disable specific assessments using command-line options:
 
-```json
-"scan_options": {
-    "privileged_accounts": true,
-    "password_policies": true,
-    "security_groups": true,
-    "trust_relationships": true,
-    "domain_controllers": true,
-    "service_accounts": true
-}
+```bash
+adseceval --config config.json --assessments privileged_accounts password_policy domain_controllers trust_relationships
 ```
+
+Or enable all assessments with the `all` option:
+
+```bash
+adseceval --config config.json --assessments all
+```
+
+### Safe Mode and Exploitation Testing
+
+The exploitation assessment module includes tests that validate vulnerabilities by attempting safe exploitation. By default, these tests run in a simulation mode that doesn't perform actual exploitation. To enable full testing:
+
+```bash
+adseceval --config config.json --assessments exploitation --exploitation
+```
+
+To ensure all tests run in a completely safe mode:
+
+```bash
+adseceval --config config.json --safe-mode
+```
+
+### Compliance Framework Selection
+
+You can specify which compliance frameworks to assess against:
+
+```bash
+adseceval --config config.json --assessments compliance --compliance-framework nist
+```
+
+Available frameworks:
+- `nist` - NIST SP 800-53
+- `cis` - CIS Controls
+- `iso27001` - ISO 27001
+- `pci-dss` - PCI DSS
+- `hipaa` - HIPAA Security Rule
+- `all` - All frameworks (default)
 
 ## Understanding Reports
 
@@ -96,32 +129,70 @@ ADSecEval generates comprehensive reports that include:
 Reports can be generated in multiple formats:
 
 - **HTML** - Interactive web-based report (default)
-- **PDF** - Printable document format
 - **JSON** - Machine-readable format for integration with other tools
 - **CSV** - Spreadsheet format for further analysis
 
-### Sample Report Structure
+### Enhanced HTML Report Structure
 
-The HTML report is organized as follows:
+The HTML report includes the following sections:
 
-1. **Overview**
-   - Assessment summary
-   - Risk score
-   - Critical findings count
+1. **Executive Summary**
+   - Assessment summary and overview
+   - Risk score and compliance status
+   - Critical findings count by severity
+   - Top remediation recommendations
 
 2. **Findings by Category**
    - Each assessment module's findings
-   - Severity indicators
-   - Affected objects
+   - Severity indicators and impact assessment
+   - Affected objects and detailed context
+   - Compliance framework mappings
+   - Exploitation test results (when applicable)
 
-3. **Recommendations**
-   - Prioritized remediation steps
-   - Implementation guidance
-   - Best practice references
+3. **Remediation Action Plan**
+   - Prioritized remediation steps by risk
+   - Detailed implementation guidance
+   - Best practice references with external links
+   - Specific configuration steps for remediation
+   - Compliance impact of remediation actions
 
-4. **Technical Details**
+4. **Compliance Mapping**
+   - Mapping to NIST SP 800-53 controls
+   - CIS Controls alignment
+   - ISO 27001 controls mapping
+   - PCI DSS requirements alignment
+   - HIPAA Security Rule compliance mapping
+
+5. **Technical Details**
    - Detailed configuration information
-   - Raw assessment data
+   - Raw assessment data and context
+   - Exploitation test details (when applicable)
+   - Group Policy configuration details
+   - Privileged access assessment details
+
+### JSON Report Structure
+
+The JSON report includes structured data for easy integration with other security tools and includes:
+
+1. **Metadata Section**
+   - Assessment information 
+   - Environment details
+   - Execution timestamp and version
+
+2. **Remediation Plan Section**
+   - Prioritized list of findings to address
+   - Step-by-step remediation guidance
+   - Compliance impact information
+
+3. **Assessment Results Section**
+   - Results from all assessment modules
+   - Detailed finding information
+   - Technical context and configuration details
+
+4. **Compliance Mapping Section**
+   - Complete mapping to compliance frameworks
+   - Gap analysis information
+   - Compliance status by framework
 
 ## Regular Assessment Schedule
 

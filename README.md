@@ -47,12 +47,54 @@ The tool connects to your AD environment via LDAP, performs security checks agai
   - External trust security inspection
   - Forest trust configuration evaluation
 
+- **Exploitation and Vulnerability Validation**
+  - Kerberoasting vulnerability detection and validation
+  - AS-REP Roasting vulnerability assessment
+  - NTLM relay vulnerability detection
+  - Anonymous LDAP binding detection
+  - SMB null session testing
+  - Password spraying vulnerability assessment
+  - LLMNR/NBT-NS/WPAD poisoning detection
+  - AD Certificate Services vulnerability assessment
+  - Kerberos delegation vulnerability detection
+
+- **Compliance Mapping and Assessment**
+  - NIST SP 800-53 controls mapping
+  - CIS Controls compliance assessment
+  - ISO 27001 controls mapping
+  - PCI DSS requirements assessment
+  - HIPAA Security Rule compliance evaluation
+  - Cross-framework gap analysis
+
+- **Group Policy Security**
+  - Default Domain Policy assessment
+  - Password policy GPO evaluation
+  - Privileged access management GPO review
+  - Audit policy configuration assessment
+  - User rights assignment analysis
+  - Security options configuration review
+  - WMI filtering utilization check
+  - Empty GPO detection
+  - GPO permissions security review
+
+- **Advanced Privileged Access Management**
+  - PAM solution detection and assessment
+  - Privileged Access Workstation (PAW) implementation check
+  - Just-in-time privileged access assessment
+  - Administrative forest implementation review
+  - Windows Defender Credential Guard evaluation
+  - Pass-the-Hash mitigation assessment
+  - Protected Users group membership review
+
 ### Reporting Capabilities
 
-- HTML reports with executive summaries and detailed findings
+- Enhanced HTML reports with executive summaries and detailed findings
+- Remediation recommendations prioritized by risk
+- Compliance mapping to major regulatory frameworks
 - JSON output for integration with other tools
 - CSV output for spreadsheet analysis
 - Severity-based categorization of findings
+- Actionable remediation guidance for all findings
 
 ## Project Status
 
@@ -147,11 +189,16 @@ This is an open-source project in early development. Contributions are welcome:
 
 ## Future Roadmap
 
-- Complete implementation of assessment modules
-- Detailed remediation guidance
+- Further enhance exploitation testing capabilities
+- Add automatic remediation options
 - Integration with AD management tools
+- Integration with SIEM solutions for continuous monitoring
 - Historical trend analysis
+- Supporting multiple assessment runs and comparison
+- Attack path visualization for risk prioritization 
 - Support for Azure AD/Entra ID assessment
+- Enhanced Privileged Access Management (PAM) solution integration
+- Additional advanced security assessment checks
 
 ## License
 

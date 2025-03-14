@@ -110,6 +110,33 @@ After compromising one system, attackers move laterally across the network. Netw
 
 The ultimate goal for many attackers is to achieve domain dominance (e.g., obtaining Domain Admin privileges). Properly secured domain controllers, restricted privileged account usage, and implementing PAW strategies help prevent this.
 
+### 5. Advanced Attack Techniques
+
+#### Kerberoasting
+
+Attackers target service accounts with SPNs to request and offline crack service tickets. This technique allows attackers to obtain service account passwords without sending suspicious traffic or requiring elevated privileges.
+
+#### AS-REP Roasting
+
+By targeting accounts with Kerberos pre-authentication disabled, attackers can request AS-REP tickets and attempt to crack them offline to reveal passwords.
+
+#### NTLM Relay
+
+Attackers capture NTLM authentication traffic and relay it to another service to authenticate as the user. Proper implementation of SMB signing, LDAP signing, and channel binding helps prevent these attacks.
+
+#### Active Directory Certificate Services (ADCS) Abuse
+
+Misconfigured certificate templates can be exploited to obtain certificates for other users, enabling impersonation and unauthorized privilege escalation.
+
+### 6. Group Policy Security
+
+Group Policy is a powerful mechanism that can either strengthen security or, if misconfigured, introduce security vulnerabilities:
+
+- Overprivileged user rights assignments can lead to privilege escalation
+- Weak security settings can enable attack techniques
+- Insufficient audit policies can allow attacks to go undetected
+- Improper GPO permissions can enable attackers to modify security settings
+
 ## Remediation Strategies
 
 ### Immediate Actions
@@ -136,17 +163,39 @@ For a comprehensive security posture, consider:
 - Red team exercises
 - Security training for administrators
 
-## Recommended Security Frameworks
+## Security Frameworks and Compliance
 
-ADSecEval's recommendations align with industry security frameworks:
+ADSecEval maps findings to industry security frameworks and compliance standards, providing a comprehensive view of your Active Directory security posture:
 
-1. **Microsoft ESAE/Red Forest** - A tiered administrative model for AD security.
+### Security Frameworks
 
-2. **NIST Cybersecurity Framework** - Risk-based approach to managing cybersecurity risk.
+1. **Microsoft ESAE/Red Forest** - A tiered administrative model for AD security separation and enhanced protection.
 
-3. **CIS Controls** - Prioritized set of actions to protect organizations from known cyber attack vectors.
+2. **NIST Cybersecurity Framework** - Risk-based approach to managing cybersecurity risk with core functions: Identify, Protect, Detect, Respond, Recover.
 
-4. **MITRE ATT&CK** - Knowledge base of adversary tactics and techniques.
+3. **CIS Controls** - Prioritized set of actions to protect organizations from known cyber attack vectors, organized into implementation groups.
+
+4. **MITRE ATT&CK** - Knowledge base of adversary tactics and techniques based on real-world observations.
+
+### Compliance Standards
+
+1. **NIST SP 800-53** - Comprehensive security controls catalog for federal information systems with control baselines.
+
+2. **ISO 27001** - International standard for information security management systems (ISMS) with Annex A controls.
+
+3. **PCI DSS** - Payment Card Industry Data Security Standard requirements for handling cardholder data.
+
+4. **HIPAA Security Rule** - Requirements for protecting electronic protected health information (ePHI).
+
+### Privileged Access Management Models
+
+1. **Microsoft Tiered Administration Model** - Separates administrative accounts and systems into tiers to limit lateral movement.
+
+2. **Zero Standing Privileges** - Eliminating permanent privileged access and requiring just-in-time elevation.
+
+3. **Secure Administrative Hosts** - Using dedicated, hardened workstations for administrative tasks.
+
+4. **Administrative Forest Design** - Implementing a separate forest for administrative accounts with enhanced security.
 
 ## Conclusion
 

@@ -30,7 +30,9 @@ class CheckResult:
         passed: bool,
         details: Dict[str, Any],
         recommendation: str,
-        reference_url: Optional[str] = None
+        reference_url: Optional[str] = None,
+        compliance_mappings: Optional[Dict[str, List[str]]] = None,
+        exploitation_results: Optional[Dict[str, Any]] = None
     ):
         """
         Initialize a new security check result.
@@ -43,6 +45,9 @@ class CheckResult:
             details: Detailed information about the check result
             recommendation: Recommended action to remediate the issue
             reference_url: URL to reference documentation
+            compliance_mappings: Dictionary mapping compliance frameworks to control IDs
+                e.g., {"NIST SP 800-53": ["AC-2", "AC-6"], "CIS": ["1.4", "1.5"]}
+            exploitation_results: Results of exploitation tests related to this finding
         """
         self.name = name
         self.description = description
@@ -51,6 +56,8 @@ class CheckResult:
         self.details = details
         self.recommendation = recommendation
         self.reference_url = reference_url
+        self.compliance_mappings = compliance_mappings or {}
+        self.exploitation_results = exploitation_results or {}
     
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -66,7 +73,9 @@ class CheckResult:
             "passed": self.passed,
             "details": self.details,
             "recommendation": self.recommendation,
-            "reference_url": self.reference_url
+            "reference_url": self.reference_url,
+            "compliance_mappings": self.compliance_mappings,
+            "exploitation_results": self.exploitation_results
         }
 
 

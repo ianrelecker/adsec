@@ -23,6 +23,10 @@ from .assessments.trust_relationships import TrustRelationshipsAssessment
 from .assessments.auth_protocols import AuthProtocolsAssessment
 from .assessments.tiered_admin import TieredAdminAssessment
 from .assessments.adcs import ADCSAssessment
+from .assessments.exploitation import ExploitationAssessment
+from .assessments.compliance import ComplianceAssessment
+from .assessments.privileged_access import PrivilegedAccessAssessment
+from .assessments.group_policy import GroupPolicyAssessment
 
 logger = logging.getLogger(__name__)
 
@@ -131,9 +135,30 @@ def parse_args() -> argparse.Namespace:
         type=str,
         nargs="+",
         choices=["all", "privileged_accounts", "password_policy", "domain_controllers", 
-                "trust_relationships", "auth_protocols", "tiered_admin", "adcs"],
+                "trust_relationships", "auth_protocols", "tiered_admin", "adcs",
+                "exploitation", "compliance", "privileged_access", "group_policy"],
         default=["all"],
         help="Specific assessments to run (default: all)"
+    )
+    
+    parser.add_argument(
+        "--compliance-framework",
+        type=str,
+        choices=["nist", "cis", "iso27001", "pci-dss", "hipaa", "all"],
+        default="all",
+        help="Compliance framework to evaluate against (default: all)"
+    )
+    
+    parser.add_argument(
+        "--exploitation",
+        action="store_true",
+        help="Enable exploitation testing (use with caution in production environments)"
+    )
+    
+    parser.add_argument(
+        "--safe-mode",
+        action="store_true",
+        help="Run in safe mode (no modifications or risky operations)"
     )
     
     parser.add_argument(
@@ -190,6 +215,11 @@ def main() -> int:
             logger.info("Initializing assessment modules")
             assessments = []
             
+            # Update config with command-line arguments
+            config["safe_mode"] = args.safe_mode
+            config["exploitation_enabled"] = args.exploitation
+            config["compliance_framework"] = args.compliance_framework
+            
             if "all" in args.assessments or "privileged_accounts" in args.assessments:
                 assessments.append(PrivilegedAccountsAssessment(client, config))
             
@@ -210,6 +240,24 @@ def main() -> int:
             
             if "all" in args.assessments or "adcs" in args.assessments:
                 assessments.append(ADCSAssessment(client, config))
+                
+            # Add new assessment modules
+            if "all" in args.assessments or "group_policy" in args.assessments:
+                assessments.append(GroupPolicyAssessment(client, config))
+                
+            if "all" in args.assessments or "privileged_access" in args.assessments:
+                assessments.append(PrivilegedAccessAssessment(client, config))
+                
+            if ("all" in args.assessments or "compliance" in args.assessments):
+                assessments.append(ComplianceAssessment(client, config))
+                
+            if ("all" in args.assessments or "exploitation" in args.assessments) and args.exploitation:
+                if args.safe_mode:
+                    logger.warning("Exploitation testing requested but safe mode is enabled - exploitation tests will be simulated only")
+                    config["exploitation_simulation_only"] = True
+                assessments.append(ExploitationAssessment(client, config))
+            elif "exploitation" in args.assessments and not args.exploitation:
+                logger.warning("Exploitation assessment was requested but --exploitation flag was not set. Use --exploitation to enable this module.")
             
             if not assessments:
                 logger.error("No assessment modules selected")
