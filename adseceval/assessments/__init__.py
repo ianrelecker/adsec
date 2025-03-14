@@ -10,6 +10,9 @@ from .privileged_accounts import PrivilegedAccountsAssessment
 from .password_policy import PasswordPolicyAssessment
 from .domain_controllers import DomainControllerAssessment
 from .trust_relationships import TrustRelationshipsAssessment
+from .auth_protocols import AuthProtocolsAssessment
+from .tiered_admin import TieredAdminAssessment
+from .adcs import ADCSAssessment
 
 __all__ = [
     'AssessmentBase',
@@ -19,4 +22,7 @@ __all__ = [
     'PasswordPolicyAssessment',
     'DomainControllerAssessment',
     'TrustRelationshipsAssessment',
+    'AuthProtocolsAssessment',
+    'TieredAdminAssessment',
+    'ADCSAssessment',
 ]

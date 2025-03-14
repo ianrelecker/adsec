@@ -20,6 +20,9 @@ from .assessments.privileged_accounts import PrivilegedAccountsAssessment
 from .assessments.password_policy import PasswordPolicyAssessment
 from .assessments.domain_controllers import DomainControllerAssessment
 from .assessments.trust_relationships import TrustRelationshipsAssessment
+from .assessments.auth_protocols import AuthProtocolsAssessment
+from .assessments.tiered_admin import TieredAdminAssessment
+from .assessments.adcs import ADCSAssessment
 
 logger = logging.getLogger(__name__)
 
@@ -127,7 +130,8 @@ def parse_args() -> argparse.Namespace:
         "--assessments",
         type=str,
         nargs="+",
-        choices=["all", "privileged_accounts", "password_policy", "domain_controllers", "trust_relationships"],
+        choices=["all", "privileged_accounts", "password_policy", "domain_controllers", 
+                "trust_relationships", "auth_protocols", "tiered_admin", "adcs"],
         default=["all"],
         help="Specific assessments to run (default: all)"
     )
@@ -197,6 +201,15 @@ def main() -> int:
             
             if "all" in args.assessments or "trust_relationships" in args.assessments:
                 assessments.append(TrustRelationshipsAssessment(client, config))
+            
+            if "all" in args.assessments or "auth_protocols" in args.assessments:
+                assessments.append(AuthProtocolsAssessment(client, config))
+            
+            if "all" in args.assessments or "tiered_admin" in args.assessments:
+                assessments.append(TieredAdminAssessment(client, config))
+            
+            if "all" in args.assessments or "adcs" in args.assessments:
+                assessments.append(ADCSAssessment(client, config))
             
             if not assessments:
                 logger.error("No assessment modules selected")
