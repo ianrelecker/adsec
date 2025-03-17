@@ -93,7 +93,7 @@ class ADClient:
                     password = os.environ.get(password_env, "")
                 
                 if not password:
-                    logger.error(f"No password found in environment variable {password_env}")
+                    logger.error("No password found in the specified environment variable")
                     return False
                 
                 logger.info(f"Connecting to AD as {username}")
